@@ -130,10 +130,10 @@ export default function FeedPage() {
         <div className="flex items-center space-x-2 overflow-x-auto pb-1 pt-1 no-scrollbar">
           <button
             onClick={() => setSelectedTopic("all")}
-            className={`px-3 py-1 rounded-full text-xs font-medium shrink-0 transition-all cursor-pointer ${
+            className={`px-3 py-1 rounded-full text-xs font-medium shrink-0 border transition-colors select-none cursor-pointer ${
               selectedTopic === "all"
-                ? "bg-[#181715] text-white"
-                : "bg-white text-[#625C54] border border-[#E2DDD5] hover:bg-[#F3EFE8]"
+                ? "bg-[#181715] text-white border-[#181715]"
+                : "bg-white text-[#625C54] border-[#E2DDD5] hover:bg-[#F3EFE8]"
             }`}
           >
             All Topics ({stories.length})
@@ -146,10 +146,10 @@ export default function FeedPage() {
               <button
                 key={t}
                 onClick={() => setSelectedTopic(t)}
-                className={`px-3 py-1 rounded-full text-xs font-medium shrink-0 transition-all cursor-pointer ${
+                className={`px-3 py-1 rounded-full text-xs font-medium shrink-0 border transition-colors select-none cursor-pointer ${
                   isSelected
-                    ? "bg-[#181715] text-white"
-                    : "bg-white text-[#625C54] border border-[#E2DDD5] hover:bg-[#F3EFE8]"
+                    ? "bg-[#181715] text-white border-[#181715]"
+                    : "bg-white text-[#625C54] border-[#E2DDD5] hover:bg-[#F3EFE8]"
                 }`}
               >
                 {t} {count > 0 && `(${count})`}

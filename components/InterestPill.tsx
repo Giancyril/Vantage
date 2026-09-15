@@ -15,7 +15,7 @@ export function InterestPill({ label, selected, onToggle, keywordsCount }: Inter
     <button
       type="button"
       onClick={onToggle}
-      className={`px-3.5 py-2 rounded-full text-xs font-medium border flex items-center space-x-2 transition-all cursor-pointer ${
+      className={`px-3.5 py-2 rounded-full text-xs font-medium border flex items-center space-x-2 transition-colors select-none cursor-pointer ${
         selected
           ? "bg-[#181715] text-white border-[#181715] shadow-sm"
           : "bg-white text-[#4A453E] border-[#E2DDD5] hover:border-[#BFB7AA] hover:bg-[#FAF8F5]"

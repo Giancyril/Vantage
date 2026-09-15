@@ -147,7 +147,7 @@ export function ArticleCard({
           )}
           <button
             onClick={handleSaveToggle}
-            className={`flex items-center space-x-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-all cursor-pointer ${
+            className={`flex items-center space-x-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-colors select-none cursor-pointer ${
               isSaved
                 ? "bg-[#181715] text-white"
                 : "bg-[#F3EFE8] text-[#555048] hover:bg-[#EAE4DC]"

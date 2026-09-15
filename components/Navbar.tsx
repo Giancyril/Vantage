@@ -65,10 +65,10 @@ export function Navbar() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+                  className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors select-none ${
                     isActive
-                      ? "bg-[#181715] text-white"
-                      : "text-[#625C54] hover:text-[#181715] hover:bg-[#ECE8E0]"
+                      ? "bg-[#181715] text-white border-[#181715]"
+                      : "text-[#625C54] hover:text-[#181715] hover:bg-[#ECE8E0] border-transparent"
                   }`}
                 >
                   <Icon className="w-3.5 h-3.5" />
@@ -91,7 +91,7 @@ export function Navbar() {
           <button
             onClick={handleRunPipeline}
             disabled={isRunning}
-            className="flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium bg-[#C35824] hover:bg-[#AB4B1C] text-white shadow-sm transition-all disabled:opacity-70 cursor-pointer"
+            className="flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium bg-[#C35824] hover:bg-[#AB4B1C] text-white shadow-sm transition-colors select-none disabled:opacity-70 cursor-pointer"
           >
             {isRunning ? (
               <Loader2 className="w-3.5 h-3.5 animate-spin" />
