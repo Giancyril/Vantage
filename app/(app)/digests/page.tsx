@@ -1,21 +1,24 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
-import { History, Mail, ArrowRight, Sparkles, CheckCircle2 } from "lucide-react";
+import { History, ArrowRight, CheckCircle2 } from "lucide-react";
+
+interface DigestEntry {
+  id: string;
+  date: string;
+  count: number;
+  status: string;
+}
+
+const MOCK_DIGESTS: DigestEntry[] = [
+  { id: "today",     date: "Today's Executive Briefing",         count: 6,  status: "Delivered" },
+  { id: "yesterday", date: "Yesterday's Intelligence Briefing",  count: 5,  status: "Delivered" },
+  { id: "weekly",    date: "Weekly Synthesis & Horizon Scan",     count: 12, status: "Delivered" },
+];
 
 export default function DigestsArchivePage() {
-  const [digests, setDigests] = useState<any[]>([]);
-
-  useEffect(() => {
-    // Generate recent archives
-    const dates = [
-      { id: "today", date: "Today's Executive Briefing", count: 6, status: "Delivered" },
-      { id: "yesterday", date: "Yesterday's Intelligence Briefing", count: 5, status: "Delivered" },
-      { id: "weekly", date: "Weekly Synthesis & Horizon Scan", count: 12, status: "Delivered" },
-    ];
-    setDigests(dates);
-  }, []);
+  const [digests] = useState<DigestEntry[]>(MOCK_DIGESTS);
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
@@ -37,7 +40,7 @@ export default function DigestsArchivePage() {
           <Link
             key={d.id}
             href={`/digest/${d.id}`}
-            className="block bg-white rounded-xl border border-[#E9E5DE] p-5 transition-all hover:border-[#C35824] hover:shadow-sm group"
+            className="block bg-white rounded-xl border border-[#E9E5DE] p-5 transition-colors hover:border-[#C35824] hover:shadow-sm group"
           >
             <div className="flex items-center justify-between">
               <div className="space-y-1">

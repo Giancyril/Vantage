@@ -10,7 +10,7 @@ export interface TrackEventPayload {
   articleUrl: string;
   eventType: "open" | "click" | "save" | "dismiss" | "more_like_this" | "less_like_this";
   topic?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export async function recordEngagement(payload: TrackEventPayload): Promise<EngagementEvent> {

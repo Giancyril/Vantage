@@ -1,10 +1,21 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { ArticleCard } from "@/components/ArticleCard";
-import { Search, Filter, Sparkles, SlidersHorizontal, RefreshCw, Calendar, Loader2 } from "lucide-react";
-import type { AnalyzedStory } from "@/lib/analysis";
+import { Search, Sparkles, SlidersHorizontal, RefreshCw, Calendar, Loader2 } from "lucide-react";
+
+interface AnalyzedStory {
+  url: string;
+  title: string;
+  source: string;
+  summary: string;
+  whyItMatters: string;
+  matchedTopic: string;
+  matchedKeywords?: string[];
+  relevanceScore: number;
+  publishedAt?: string;
+}
 
 export default function FeedPage() {
   const [stories, setStories] = useState<AnalyzedStory[]>([]);
@@ -15,40 +26,46 @@ export default function FeedPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  useEffect(() => {
-    loadFeed();
-  }, []);
-
-  const loadFeed = async () => {
+  const loadFeed = useCallback(async () => {
     setIsLoading(true);
     try {
-      // 1. Fetch user interests to ensure seed
+      // 1. Fetch user interests
       const intRes = await fetch("/api/interests");
-      const intData = await intRes.json();
-      const topicList = (intData.interests || []).map((i: any) => i.topic);
+      const intData = (await intRes.json()) as { interests: Array<{ topic: string }> };
+      const topicList = (intData.interests || []).map((i) => i.topic);
       setTopics(topicList);
 
       // 2. Fetch saved URLs
       const savedRes = await fetch("/api/feedback?type=saved");
-      const savedData = await savedRes.json();
+      const savedData = (await savedRes.json()) as { savedUrls: string[] };
       setSavedUrls(new Set(savedData.savedUrls || []));
 
-      // 3. Trigger discovery & analysis if feed empty
-      const runRes = await fetch("/api/pipeline/run", { method: "POST" });
-      const runData = await runRes.json();
+      // 3. Trigger pipeline (fire-and-forget result)
+      await fetch("/api/pipeline/run", { method: "POST" });
 
-      // Synthesized stories
+      // 4. Fetch discovered articles
       const discoRes = await fetch("/api/pipeline/discover", { method: "POST" });
-      const discoData = await discoRes.json();
+      const discoData = (await discoRes.json()) as {
+        articles: Array<{
+          url: string;
+          title: string;
+          source: string;
+          snippet: string;
+          matchedTopic: string;
+          matchedKeywords?: string[];
+          publishedDate?: string;
+        }>;
+      };
 
       if (discoData.articles) {
-        const mapped: AnalyzedStory[] = discoData.articles.map((a: any) => ({
+        const mapped: AnalyzedStory[] = discoData.articles.map((a) => ({
           url: a.url,
           title: a.title,
           source: a.source,
           summary: a.snippet || "Recent strategic announcement impacting technical direction.",
           whyItMatters: `Directly impacts your tracking of ${a.matchedTopic}, validating strategic movement across ${a.matchedKeywords?.slice(0, 2).join(" & ")}.`,
           matchedTopic: a.matchedTopic,
+          matchedKeywords: a.matchedKeywords,
           relevanceScore: 0.88,
           publishedAt: a.publishedDate || new Date().toISOString(),
         }));
@@ -59,7 +76,12 @@ export default function FeedPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    loadFeed();
+  }, [loadFeed]);
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
@@ -114,7 +136,6 @@ export default function FeedPage() {
 
       {/* Filter and Search Bar */}
       <div className="space-y-3">
-        {/* Search */}
         <div className="relative">
           <Search className="w-4 h-4 text-[#8A8378] absolute left-3.5 top-3" />
           <input
@@ -126,11 +147,10 @@ export default function FeedPage() {
           />
         </div>
 
-        {/* Topic Pills */}
         <div className="flex items-center space-x-2 overflow-x-auto pb-1 pt-1 no-scrollbar">
           <button
             onClick={() => setSelectedTopic("all")}
-            className={`px-3 py-1 rounded-full text-xs font-medium shrink-0 border transition-colors select-none cursor-pointer ${
+            className={`px-3 py-1 rounded-full text-xs font-medium shrink-0 border border-solid transition-colors select-none cursor-pointer ${
               selectedTopic === "all"
                 ? "bg-[#181715] text-white border-[#181715]"
                 : "bg-white text-[#625C54] border-[#E2DDD5] hover:bg-[#F3EFE8]"
@@ -146,7 +166,7 @@ export default function FeedPage() {
               <button
                 key={t}
                 onClick={() => setSelectedTopic(t)}
-                className={`px-3 py-1 rounded-full text-xs font-medium shrink-0 border transition-colors select-none cursor-pointer ${
+                className={`px-3 py-1 rounded-full text-xs font-medium shrink-0 border border-solid transition-colors select-none cursor-pointer ${
                   isSelected
                     ? "bg-[#181715] text-white border-[#181715]"
                     : "bg-white text-[#625C54] border-[#E2DDD5] hover:bg-[#F3EFE8]"

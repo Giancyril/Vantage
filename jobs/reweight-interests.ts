@@ -1,4 +1,4 @@
-import { adjustWeights, getUserInterests } from "@/lib/interests";
+import { adjustWeights } from "@/lib/interests";
 import { getRecentEngagementEvents } from "@/lib/feedback";
 
 /**
@@ -13,7 +13,8 @@ export async function runReweightJob(userId: string = "00000000-0000-0000-0000-0
   const signals: Array<{ topic: string; delta: number }> = [];
 
   for (const ev of events) {
-    const topic = (ev.metadata as any)?.topic;
+    const meta = ev.metadata as Record<string, string> | null;
+    const topic = meta?.topic;
     if (!topic) continue;
 
     if (ev.eventType === "save" || ev.eventType === "click") {

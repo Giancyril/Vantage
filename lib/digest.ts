@@ -2,7 +2,7 @@ import type { AnalyzedStory } from "@/lib/analysis";
 import type { Interest } from "@/db/schema";
 import { db } from "@/lib/db";
 import { digests, digestItems } from "@/db/schema";
-import { eq, desc } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 
 export interface DigestSection {
   topic: string;
@@ -108,12 +108,12 @@ export async function getDigestById(id: string): Promise<AssembledDigest | null>
       const [record] = await db.select().from(digests).where(eq(digests.id, id));
       if (!record) return null;
 
-      const items = await db.select().from(digestItems).where(eq(digestItems.digestId, id));
+      const items: Array<{ articleUrl: string; summary: string; relevanceScore: number; whyItMatters: string }> = await db.select().from(digestItems).where(eq(digestItems.digestId, id));
       // Reconstitute sections
       const sections: DigestSection[] = [{
         topic: "Daily Intelligence Briefing",
         weight: 1.0,
-        stories: items.map((it: any) => ({
+        stories: items.map((it) => ({
           url: it.articleUrl,
           title: "Saved Article",
           source: "Publisher",
@@ -130,7 +130,7 @@ export async function getDigestById(id: string): Promise<AssembledDigest | null>
         id: record.id,
         userId: record.userId,
         date: record.createdAt.toLocaleDateString(),
-        status: record.status as any,
+        status: record.status as "pending" | "sent" | "failed",
         sections,
         totalStories: items.length,
       };

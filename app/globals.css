@@ -16,6 +16,12 @@
     --accent-forest-bg: #F2F8F4;
   }
 
+  /* Lock scrollbar gutter permanently to prevent horizontal layout shifts/shakes on page navigation */
+  html {
+    overflow-y: scroll;
+    scrollbar-gutter: stable;
+  }
+
   body {
     background-color: var(--bg-paper);
     color: var(--ink-primary);

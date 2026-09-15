@@ -1,10 +1,6 @@
 import OpenAI from "openai";
 import type { ExtractedContent } from "@/lib/extraction";
 import type { Interest } from "@/db/schema";
-import { db } from "@/lib/db";
-import { articles } from "@/db/schema";
-import { eq } from "drizzle-orm";
-
 export interface AnalyzedStory {
   url: string;
   title: string;

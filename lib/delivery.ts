@@ -20,12 +20,13 @@ export async function sendDigestEmail(
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
   const emailElement = React.createElement(DigestEmail, { digest, userName, appUrl });
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const htmlContent = await render(emailElement as any);
 
   if (resendApiKey && !resendApiKey.startsWith("re_...")) {
     try {
       const resend = new Resend(resendApiKey);
-      const data = await resend.emails.send({
+      const result = await resend.emails.send({
         from: "Vantage Intelligence <digest@resend.dev>",
         to: recipientEmail,
         subject: `Your Daily AI Intelligence Briefing — ${digest.date}`,
@@ -34,14 +35,13 @@ export async function sendDigestEmail(
 
       return {
         success: true,
-        messageId: data.data?.id,
+        // result.data is null on error, string id on success
+        messageId: result.data?.id ?? undefined,
       };
-    } catch (err: any) {
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Delivery failed";
       console.warn("Resend email delivery failed, using simulated delivery:", err);
-      return {
-        success: false,
-        error: err?.message || "Delivery failed",
-      };
+      return { success: false, error: message };
     }
   }
 

@@ -24,7 +24,6 @@ export function ArticleCard({
   whyItMatters,
   matchedTopic,
   relevanceScore,
-  publishedAt,
   initialSaved = false,
 }: ArticleCardProps) {
   const [isSaved, setIsSaved] = useState(initialSaved);

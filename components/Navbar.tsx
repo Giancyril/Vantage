@@ -2,11 +2,12 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Newspaper, Sliders, Bookmark, History, Sparkles, Loader2, CheckCircle2 } from "lucide-react";
 
 export function Navbar() {
   const pathname = usePathname();
+  const router = useRouter();
   const [isRunning, setIsRunning] = useState(false);
   const [runMessage, setRunMessage] = useState<string | null>(null);
 
@@ -28,7 +29,7 @@ export function Navbar() {
         setRunMessage(`Curated ${data.report.analyzedCount} stories!`);
         setTimeout(() => {
           setRunMessage(null);
-          window.location.href = "/feed";
+          router.push("/feed");
         }, 1500);
       } else {
         setRunMessage("Pipeline completed with notes.");
@@ -43,11 +44,11 @@ export function Navbar() {
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-[#F8F7F4]/90 backdrop-blur-md border-b border-[#E9E5DE]">
+    <header className="sticky top-0 z-40 bg-[#F8F7F4]/90 backdrop-blur-md border-b border-[#E9E5DE] w-full">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 h-13 sm:h-14 flex items-center justify-between">
         {/* Brand */}
         <div className="flex items-center space-x-5">
-          <Link href="/feed" className="flex items-center space-x-2 group">
+          <Link href="/feed" scroll={false} className="flex items-center space-x-2 group outline-none">
             <span className="font-editorial text-lg font-bold tracking-tight text-[#181715] group-hover:text-[#C35824] transition-colors">
               VANTAGE
             </span>
@@ -65,13 +66,13 @@ export function Navbar() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`flex items-center space-x-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium border transition-colors select-none ${
-                    isActive
+                  scroll={false}
+                  className={`flex items-center space-x-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium border border-solid transition-colors select-none outline-none focus:outline-none ${isActive
                       ? "bg-[#181715] text-white border-[#181715]"
-                      : "text-[#625C54] hover:text-[#181715] hover:bg-[#ECE8E0] border-transparent"
-                  }`}
+                      : "bg-transparent text-[#625C54] hover:text-[#181715] hover:bg-[#ECE8E0] border-transparent"
+                    }`}
                 >
-                  <Icon className="w-3 h-3" />
+                  <Icon className="w-3 h-3 shrink-0" />
                   <span>{item.label}</span>
                 </Link>
               );
@@ -91,12 +92,12 @@ export function Navbar() {
           <button
             onClick={handleRunPipeline}
             disabled={isRunning}
-            className="flex items-center space-x-1.5 px-3 py-1 rounded-full text-[11px] font-medium bg-[#C35824] hover:bg-[#AB4B1C] text-white shadow-xs transition-colors select-none disabled:opacity-70 cursor-pointer"
+            className="flex items-center space-x-1.5 px-3 py-1 rounded-full text-[11px] font-medium bg-[#C35824] hover:bg-[#AB4B1C] text-white shadow-xs transition-colors select-none outline-none focus:outline-none disabled:opacity-70 cursor-pointer"
           >
             {isRunning ? (
-              <Loader2 className="w-3 h-3 animate-spin" />
+              <Loader2 className="w-3 h-3 animate-spin shrink-0" />
             ) : (
-              <Sparkles className="w-3 h-3" />
+              <Sparkles className="w-3 h-3 shrink-0" />
             )}
             <span>{isRunning ? "Synthesizing..." : "Run Digest Pipeline"}</span>
           </button>

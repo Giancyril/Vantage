@@ -2,25 +2,29 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { ArrowLeft, Mail, Compass, ExternalLink } from "lucide-react";
+import { ArrowLeft, ExternalLink } from "lucide-react";
 import { WhyItMatters } from "@/components/WhyItMatters";
 
-export default function DigestViewPage({ params }: { params: Promise<{ id: string }> }) {
-  const [digestId, setDigestId] = useState("");
-  const [stories, setStories] = useState<any[]>([]);
+interface DigestArticle {
+  url: string;
+  title: string;
+  source: string;
+  snippet: string;
+  matchedTopic: string;
+  matchedKeywords?: string[];
+}
+
+export default function DigestViewPage() {
+  const [stories, setStories] = useState<DigestArticle[]>([]);
 
   useEffect(() => {
-    params.then((p) => {
-      setDigestId(p.id);
-    });
-
     fetch("/api/pipeline/discover", { method: "POST" })
       .then((r) => r.json())
-      .then((data) => {
+      .then((data: { articles: DigestArticle[] }) => {
         if (data.articles) setStories(data.articles);
       })
       .catch(console.error);
-  }, [params]);
+  }, []);
 
   return (
     <div className="max-w-2xl mx-auto space-y-8 bg-white rounded-2xl border border-[#E9E5DE] p-6 sm:p-10 shadow-sm">

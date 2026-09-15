@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
-import { interests, users, type Interest, type NewInterest } from "@/db/schema";
-import { eq, and } from "drizzle-orm";
+import { interests, type Interest } from "@/db/schema";
+import { eq } from "drizzle-orm";
 
 export interface CuratedTopic {
   id: string;

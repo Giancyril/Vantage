@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Compass, ArrowRight, Check, Sparkles, Sliders, Mail, Loader2 } from "lucide-react";
+import { Compass, ArrowRight, Check, Sparkles, Mail, Loader2 } from "lucide-react";
 import type { CuratedTopic } from "@/lib/interests";
 
 export default function OnboardingPage() {
@@ -212,7 +212,7 @@ export default function OnboardingPage() {
             </div>
             <p>1. The agent discovers candidate stories across your {selectedIds.length} chosen domains.</p>
             <p>2. Full content is extracted and scored for relevance.</p>
-            <p>3. Every article receives a tailored "Why this matters to you" briefing.</p>
+            <p>3. Every article receives a tailored &ldquo;Why this matters to you&rdquo; briefing.</p>
           </div>
 
           <div className="pt-4 flex items-center justify-between">

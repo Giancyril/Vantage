@@ -4,13 +4,14 @@ import { discoverArticlesForInterests } from "@/lib/discovery";
 
 export async function POST(req: Request) {
   try {
-    const body = await req.json().catch(() => ({}));
+    const body = (await req.json().catch(() => ({}))) as { userId?: string };
     const userId = body.userId || "00000000-0000-0000-0000-000000000001";
     const interestsList = await getUserInterests(userId);
     const discovered = await discoverArticlesForInterests(interestsList);
 
     return NextResponse.json({ count: discovered.length, articles: discovered });
-  } catch (error: any) {
-    return NextResponse.json({ error: error?.message }, { status: 500 });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown error";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
