@@ -44,14 +44,14 @@ export function Navbar() {
 
   return (
     <header className="sticky top-0 z-40 bg-[#F8F7F4]/90 backdrop-blur-md border-b border-[#E9E5DE]">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 h-13 sm:h-14 flex items-center justify-between">
         {/* Brand */}
-        <div className="flex items-center space-x-6">
+        <div className="flex items-center space-x-5">
           <Link href="/feed" className="flex items-center space-x-2 group">
-            <span className="font-editorial text-2xl font-bold tracking-tight text-[#181715] group-hover:text-[#C35824] transition-colors">
+            <span className="font-editorial text-lg font-bold tracking-tight text-[#181715] group-hover:text-[#C35824] transition-colors">
               VANTAGE
             </span>
-            <span className="text-[10px] uppercase tracking-widest font-semibold px-2 py-0.5 rounded bg-[#EAE6DF] text-[#706A60]">
+            <span className="text-[9px] uppercase tracking-wider font-semibold px-1.5 py-0.5 rounded bg-[#EAE6DF] text-[#706A60]">
               AI Agent
             </span>
           </Link>
@@ -65,13 +65,13 @@ export function Navbar() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors select-none ${
+                  className={`flex items-center space-x-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium border transition-colors select-none ${
                     isActive
                       ? "bg-[#181715] text-white border-[#181715]"
                       : "text-[#625C54] hover:text-[#181715] hover:bg-[#ECE8E0] border-transparent"
                   }`}
                 >
-                  <Icon className="w-3.5 h-3.5" />
+                  <Icon className="w-3 h-3" />
                   <span>{item.label}</span>
                 </Link>
               );
@@ -80,10 +80,10 @@ export function Navbar() {
         </div>
 
         {/* Right CTA */}
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-2.5">
           {runMessage && (
-            <span className="hidden md:inline-flex items-center text-xs font-medium text-[#C35824] bg-[#FEF8F4] border border-[#E8B499] px-2.5 py-1 rounded-full animate-pulse-subtle">
-              <CheckCircle2 className="w-3 h-3 mr-1 text-[#C35824]" />
+            <span className="hidden md:inline-flex items-center text-[10px] font-medium text-[#C35824] bg-[#FEF8F4] border border-[#E8B499] px-2 py-0.5 rounded-full animate-pulse-subtle">
+              <CheckCircle2 className="w-2.5 h-2.5 mr-1 text-[#C35824]" />
               {runMessage}
             </span>
           )}
@@ -91,12 +91,12 @@ export function Navbar() {
           <button
             onClick={handleRunPipeline}
             disabled={isRunning}
-            className="flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium bg-[#C35824] hover:bg-[#AB4B1C] text-white shadow-sm transition-colors select-none disabled:opacity-70 cursor-pointer"
+            className="flex items-center space-x-1.5 px-3 py-1 rounded-full text-[11px] font-medium bg-[#C35824] hover:bg-[#AB4B1C] text-white shadow-xs transition-colors select-none disabled:opacity-70 cursor-pointer"
           >
             {isRunning ? (
-              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              <Loader2 className="w-3 h-3 animate-spin" />
             ) : (
-              <Sparkles className="w-3.5 h-3.5" />
+              <Sparkles className="w-3 h-3" />
             )}
             <span>{isRunning ? "Synthesizing..." : "Run Digest Pipeline"}</span>
           </button>
