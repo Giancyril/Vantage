@@ -42,7 +42,7 @@ export default function OnboardingPage() {
         body: JSON.stringify({ topicIds: selectedIds }),
       });
 
-      // 2. Trigger initial distillation pipeline
+      // 2. Trigger initial synthesis pipeline
       await fetch("/api/pipeline/run", {
         method: "POST",
         headers: { "Content-Type": "application/json" },

@@ -3,7 +3,7 @@ import "./globals.css";
 import { Navbar } from "@/components/Navbar";
 
 export const metadata: Metadata = {
-  title: "DISTILL — Personalized AI News Intelligence",
+  title: "VANTAGE — Personalized AI News Intelligence",
   description: "Reads hundreds of articles, learns your interests, and explains why each story matters to you.",
 };
 

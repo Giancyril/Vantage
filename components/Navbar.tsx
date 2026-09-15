@@ -49,7 +49,7 @@ export function Navbar() {
         <div className="flex items-center space-x-6">
           <Link href="/feed" className="flex items-center space-x-2 group">
             <span className="font-editorial text-2xl font-bold tracking-tight text-[#181715] group-hover:text-[#C35824] transition-colors">
-              DISTILL
+              VANTAGE
             </span>
             <span className="text-[10px] uppercase tracking-widest font-semibold px-2 py-0.5 rounded bg-[#EAE6DF] text-[#706A60]">
               AI Agent
@@ -98,7 +98,7 @@ export function Navbar() {
             ) : (
               <Sparkles className="w-3.5 h-3.5" />
             )}
-            <span>{isRunning ? "Distilling..." : "Run Digest Pipeline"}</span>
+            <span>{isRunning ? "Vantageing..." : "Run Digest Pipeline"}</span>
           </button>
         </div>
       </div>

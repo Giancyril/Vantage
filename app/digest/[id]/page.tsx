@@ -35,7 +35,7 @@ export default function DigestViewPage({ params }: { params: Promise<{ id: strin
       {/* Editorial Header */}
       <div className="text-center pb-6 border-b border-[#EAE6DF] space-y-2">
         <span className="text-[11px] uppercase tracking-widest font-bold text-[#8C8275]">
-          THE DAILY DISTILL &bull; WEB ARCHIVE
+          THE DAILY VANTAGE &bull; WEB ARCHIVE
         </span>
         <h1 className="font-editorial text-3xl sm:text-4xl font-bold text-[#181715]">
           Executive Intelligence Briefing

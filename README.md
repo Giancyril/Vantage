@@ -1,4 +1,4 @@
-# Distill — Personalized AI News Intelligence Agent
+# Vantage — Personalized AI News Intelligence Agent
 
 A production-grade, autonomous AI news intelligence platform that reads hundreds of articles daily, extracts full text, models personal interest profiles, and delivers synthesized executive briefings via email and an editorial web reader — continuously learning from what you read, save, and dismiss.
 
@@ -99,8 +99,8 @@ articles (url [PK], title, source, published_at, scraped_text, embedding, summar
 ### 2. Installation
 ```bash
 # Clone the repository
-git clone https://github.com/Giancyril/Distill.git
-cd Distill
+git clone https://github.com/Giancyril/Vantage.git
+cd Vantage
 
 # Install dependencies
 npm install --legacy-peer-deps

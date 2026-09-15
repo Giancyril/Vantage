@@ -26,7 +26,7 @@ export async function sendDigestEmail(
     try {
       const resend = new Resend(resendApiKey);
       const data = await resend.emails.send({
-        from: "Distill Intelligence <digest@resend.dev>",
+        from: "Vantage Intelligence <digest@resend.dev>",
         to: recipientEmail,
         subject: `Your Daily AI Intelligence Briefing — ${digest.date}`,
         html: htmlContent,

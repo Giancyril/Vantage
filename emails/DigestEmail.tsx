@@ -32,7 +32,7 @@ export const DigestEmail: React.FC<DigestEmailProps> = ({
         <Container style={containerStyle}>
           {/* Header */}
           <Section style={headerSection}>
-            <Text style={kickerStyle}>THE DAILY DISTILL</Text>
+            <Text style={kickerStyle}>THE DAILY VANTAGE</Text>
             <Heading as="h1" style={titleStyle}>
               Intelligence Briefing
             </Heading>
@@ -73,7 +73,7 @@ export const DigestEmail: React.FC<DigestEmailProps> = ({
           {/* Footer */}
           <Section style={footerSection}>
             <Text style={footerText}>
-              Delivered by <Link href={appUrl} style={footerLink}>Distill AI News Agent</Link>.
+              Delivered by <Link href={appUrl} style={footerLink}>Vantage AI News Agent</Link>.
               Learns from what you read, save, and dismiss.
             </Text>
             <Text style={footerSub}>
