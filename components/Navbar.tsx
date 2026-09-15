@@ -98,7 +98,7 @@ export function Navbar() {
             ) : (
               <Sparkles className="w-3.5 h-3.5" />
             )}
-            <span>{isRunning ? "Vantageing..." : "Run Digest Pipeline"}</span>
+            <span>{isRunning ? "Synthesizing..." : "Run Digest Pipeline"}</span>
           </button>
         </div>
       </div>
