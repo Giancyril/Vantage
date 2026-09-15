@@ -163,7 +163,7 @@ export default function FeedPage() {
       {isLoading ? (
         <div className="py-20 text-center space-y-3">
           <Loader2 className="w-6 h-6 animate-spin text-[#C35824] mx-auto" />
-          <p className="text-sm font-medium text-[#4A453E]">Vantageing stories from hundreds of sources...</p>
+          <p className="text-sm font-medium text-[#4A453E]">Synthesizing stories from hundreds of sources...</p>
           <p className="text-xs text-[#8A8378]">Extracting full text, scoring relevance, and generating personalized insights</p>
         </div>
       ) : filteredStories.length === 0 ? (
