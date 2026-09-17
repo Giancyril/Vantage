@@ -32,13 +32,20 @@ function stripCdataAndTags(str: string): string {
 }
 
 function getTagValue(block: string, tag: string): string {
-  const cdataRegex = new RegExp(`<${tag}[^>]*><!\[CDATA\[([\s\S]*?)\]\]><\/${tag}>`, "i");
+  // CDATA match: <tag><![CDATA[...]]></tag>
+  const cdataRegex = new RegExp(`<${tag}[^>]*>\\s*<!\\[CDATA\\[([\\s\\S]*?)\\]\\]>\\s*<\\/${tag}>`, "i");
   const cdataMatch = block.match(cdataRegex);
   if (cdataMatch) return cdataMatch[1].trim();
 
-  const standardRegex = new RegExp(`<${tag}[^>]*>([\s\S]*?)<\/${tag}>`, "i");
+  // Standard match: <tag>...</tag>
+  const standardRegex = new RegExp(`<${tag}[^>]*>([\\s\\S]*?)<\\/${tag}>`, "i");
   const standardMatch = block.match(standardRegex);
-  if (standardMatch) return standardMatch[1].trim();
+  if (standardMatch) {
+    const raw = standardMatch[1].trim();
+    // If it contains embedded CDATA:
+    const innerCdata = raw.match(/<!\[CDATA\[([\s\S]*?)\]\]>/i);
+    return innerCdata ? innerCdata[1].trim() : raw;
+  }
 
   return "";
 }
@@ -54,8 +61,9 @@ export function parseFeedXml(xml: string, feedUrl: string): ParsedFeed {
   const isSubstack = feedUrl.includes("substack.com") || /substack\.com/i.test(xml);
 
   if (isAtom) {
-    const feedTitle = stripCdataAndTags(getTagValue(xml, "title")) || "Atom Feed";
-    const feedSubtitle = stripCdataAndTags(getTagValue(xml, "subtitle"));
+    const feedHeader = xml.split(/<entry[^>]*>/i)[0];
+    const feedTitle = stripCdataAndTags(getTagValue(feedHeader, "title")) || "Atom Feed";
+    const feedSubtitle = stripCdataAndTags(getTagValue(feedHeader, "subtitle"));
     
     let siteUrl = "";
     const siteUrlMatch = xml.match(/<link[^>]*rel=['"]alternate['"][^>]*href=['"]([^'"]+)['"]/i) ||
@@ -104,9 +112,10 @@ export function parseFeedXml(xml: string, feedUrl: string): ParsedFeed {
 
   // RSS 2.0 Parser
   const channelBlock = xml.split(/<channel[^>]*>/i)[1] || xml;
-  const feedTitle = stripCdataAndTags(getTagValue(channelBlock, "title")) || "RSS Feed";
-  const feedDescription = stripCdataAndTags(getTagValue(channelBlock, "description"));
-  const siteUrl = stripCdataAndTags(getTagValue(channelBlock, "link"));
+  const channelHeader = channelBlock.split(/<item[^>]*>/i)[0];
+  const feedTitle = stripCdataAndTags(getTagValue(channelHeader, "title")) || "RSS Feed";
+  const feedDescription = stripCdataAndTags(getTagValue(channelHeader, "description"));
+  const siteUrl = stripCdataAndTags(getTagValue(channelHeader, "link"));
 
   const itemBlocks = channelBlock.split(/<item[^>]*>/i).slice(1);
   const items: ParsedFeedItem[] = [];
