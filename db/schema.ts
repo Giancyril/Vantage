@@ -66,6 +66,24 @@ export const engagementEvents = pgTable("engagement_events", {
   createdAt:  timestamp("created_at").defaultNow().notNull(),
 }, (t) => [index("engagement_user_idx").on(t.userId), index("engagement_article_idx").on(t.articleUrl)]);
 
+// -- Feed Sources (RSS, Atom, Substack sources monitored for ingestion) -------
+export const feedSources = pgTable("feed_sources", {
+  id:            uuid("id").primaryKey().defaultRandom(),
+  userId:        uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  url:           text("url").notNull(),
+  title:         text("title").notNull(),
+  siteUrl:       text("site_url"),
+  feedType:      text("feed_type").notNull().default("rss"), // rss | atom | substack
+  lastFetchedAt: timestamp("last_fetched_at"),
+  fetchStatus:   text("fetch_status").notNull().default("healthy"), // healthy | warning | error
+  failureCount:  integer("failure_count").notNull().default(0),
+  errorMessage:  text("error_message"),
+  etag:          text("etag"),
+  isActive:      integer("is_active").notNull().default(1),
+  createdAt:     timestamp("created_at").defaultNow().notNull(),
+  updatedAt:     timestamp("updated_at").defaultNow().notNull(),
+}, (t) => [index("feed_sources_user_idx").on(t.userId), index("feed_sources_url_idx").on(t.url)]);
+
 // -- Type exports -------------------------------------------------------------
 export type User            = typeof users.$inferSelect;
 export type NewUser         = typeof users.$inferInsert;
@@ -78,3 +96,5 @@ export type NewDigest       = typeof digests.$inferInsert;
 export type DigestItem      = typeof digestItems.$inferSelect;
 export type NewDigestItem   = typeof digestItems.$inferInsert;
 export type EngagementEvent = typeof engagementEvents.$inferSelect;
+export type FeedSource    = typeof feedSources.$inferSelect;
+export type NewFeedSource = typeof feedSources.$inferInsert;
