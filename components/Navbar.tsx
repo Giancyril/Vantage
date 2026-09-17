@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Newspaper, Sliders, Bookmark, History, Sparkles, Loader2, CheckCircle2 } from "lucide-react";
+import { Newspaper, Sliders, Bookmark, History, Sparkles, Loader2, CheckCircle2, Rss } from "lucide-react";
 
 export function Navbar() {
   const pathname = usePathname();
@@ -14,6 +14,7 @@ export function Navbar() {
   const navItems = [
     { label: "Daily Feed", href: "/feed", icon: Newspaper },
     { label: "Interest Profile", href: "/interests", icon: Sliders },
+    { label: "News Sources", href: "/sources", icon: Rss },
     { label: "Saved Stories", href: "/saved", icon: Bookmark },
     { label: "Digest Archive", href: "/digests", icon: History },
   ];
