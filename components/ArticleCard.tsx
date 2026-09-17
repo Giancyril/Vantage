@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { ExternalLink, Bookmark, ThumbsUp, ThumbsDown, Check, Sparkles } from "lucide-react";
+import { ExternalLink, Bookmark, ThumbsUp, ThumbsDown, Check } from "lucide-react";
 import { WhyItMatters } from "@/components/WhyItMatters";
 
 export interface ArticleCardProps {
@@ -92,8 +92,7 @@ export function ArticleCard({
         </div>
 
         {/* Relevance badge */}
-        <div className="flex items-center space-x-1.5 px-2 py-0.5 rounded-full bg-[#F3F0EA] text-[#555048] text-[11px] font-medium">
-          <Sparkles className="w-3 h-3 text-[#C35824]" />
+        <div className="flex items-center px-2 py-0.5 rounded-full bg-[#F3F0EA] text-[#555048] text-[11px] font-medium">
           <span>{relevancePct}% Match</span>
         </div>
       </div>
