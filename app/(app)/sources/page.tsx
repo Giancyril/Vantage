@@ -13,7 +13,6 @@ import {
   CheckCircle2,
   AlertTriangle,
   Radio,
-  Sparkles,
 } from "lucide-react";
 
 export default function SourcesPage() {
@@ -139,7 +138,6 @@ export default function SourcesPage() {
       {/* Toast Notification */}
       {toastMessage && (
         <div className="fixed bottom-6 right-6 z-50 bg-[#181715] text-white text-xs px-4 py-2.5 rounded-xl shadow-xl flex items-center gap-2 animate-in slide-in-from-bottom-2 duration-150 border border-white/10">
-          <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0" />
           <span>{toastMessage}</span>
         </div>
       )}
@@ -263,7 +261,7 @@ export default function SourcesPage() {
               onClick={handleSeedPresets}
               className="px-4 py-2 rounded-xl text-xs font-medium bg-[#181715] text-white hover:bg-[#2C2926] transition-colors cursor-pointer shadow-xs flex items-center gap-1.5"
             >
-              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+
               <span>Load Top 3 Recommended Feeds</span>
             </button>
             <button
