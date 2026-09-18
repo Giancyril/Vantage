@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
-import { ExternalLink, Compass, ShieldAlert, ArrowRight, BookOpen } from "lucide-react";
+import React from "react";
+import { ExternalLink, Compass, ArrowRight } from "lucide-react";
 import { ClusterBadge } from "./ClusterBadge";
 import type { ClusteredGroup } from "@/lib/clustering";
 
@@ -14,7 +14,6 @@ export function StoryClusterCard({
   cluster,
   onOpenPerspectives,
 }: StoryClusterCardProps) {
-  const [expandedSources, setExpandedSources] = useState(false);
   const sources = Array.from(new Set(cluster.articles.map((a) => a.source)));
 
   return (

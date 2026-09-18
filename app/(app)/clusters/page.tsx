@@ -3,12 +3,8 @@
 import React, { useState, useEffect } from "react";
 import {
   Layers,
-  Compass,
   RefreshCw,
-  Sparkles,
   Filter,
-  CheckCircle2,
-  Newspaper,
 } from "lucide-react";
 import { StoryClusterCard } from "@/components/StoryClusterCard";
 import { PerspectiveDrawer } from "@/components/PerspectiveDrawer";
@@ -27,28 +23,32 @@ export default function ClustersPage() {
     totalArticlesGrouped: 0,
   });
 
-  const loadClusters = async () => {
-    setLoading(true);
-    try {
-      const res = await fetch("/api/clusters");
-      const data = await res.json();
-      if (data.clusters) {
-        setClusters(data.clusters);
-        setStats(data.stats || {
-          totalClusters: data.clusters.length,
-          multiArticleCount: data.clusters.filter((c: ClusteredGroup) => c.articles.length > 1).length,
-          totalArticlesGrouped: data.clusters.reduce((a: number, c: ClusteredGroup) => a + c.articles.length, 0),
-        });
-      }
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    loadClusters();
+    let ignore = false;
+    async function init() {
+      try {
+        const res = await fetch("/api/clusters");
+        const data = await res.json();
+        if (!ignore && data.clusters) {
+          setClusters(data.clusters);
+          setStats(data.stats || {
+            totalClusters: data.clusters.length,
+            multiArticleCount: data.clusters.filter((c: ClusteredGroup) => c.articles.length > 1).length,
+            totalArticlesGrouped: data.clusters.reduce((a: number, c: ClusteredGroup) => a + c.articles.length, 0),
+          });
+        }
+      } catch (e) {
+        console.error(e);
+      } finally {
+        if (!ignore) {
+          setLoading(false);
+        }
+      }
+    }
+    init();
+    return () => {
+      ignore = true;
+    };
   }, []);
 
   const handleRunReclustering = async () => {

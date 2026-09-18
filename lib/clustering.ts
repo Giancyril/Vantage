@@ -1,5 +1,5 @@
 import { db, hasDatabase } from "@/lib/db";
-import { articles, storyClusters, clusterArticles, type StoryCluster } from "@/db/schema";
+import { articles, storyClusters, clusterArticles } from "@/db/schema";
 import { eq, and, desc } from "drizzle-orm";
 import { articleSimilarity, generateClusterKey } from "./similarity";
 
@@ -214,7 +214,7 @@ export async function runClusteringForUser(
                 source: art.source,
                 rank,
               });
-            } catch (e) {
+            } catch {
               // Ignore foreign key violations if article is only in memory
             }
           }

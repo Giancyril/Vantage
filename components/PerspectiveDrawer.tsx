@@ -5,12 +5,8 @@ import {
   X,
   Compass,
   CheckCircle2,
-  AlertTriangle,
-  ExternalLink,
-  Layers,
   Scale,
   RefreshCw,
-  Sparkles,
 } from "lucide-react";
 import type { ClusteredGroup } from "@/lib/clustering";
 import type { SynthesizedStory, Perspective, Contradiction } from "@/lib/synthesis";
@@ -32,28 +28,35 @@ export function PerspectiveDrawer({
 
   useEffect(() => {
     if (!isOpen || !cluster) {
-      setSynthesis(null);
       return;
     }
 
+    let ignore = false;
     const fetchSynthesis = async () => {
-      setLoading(true);
-      setError(null);
       try {
         const id = cluster.id || encodeURIComponent(cluster.clusterKey);
         const res = await fetch(`/api/clusters/${id}`);
         if (!res.ok) throw new Error("Failed to load synthesis");
         const data = await res.json();
-        setSynthesis(data.synthesis);
+        if (!ignore) {
+          setSynthesis(data.synthesis);
+        }
       } catch (e) {
         console.error(e);
-        setError("Could not load comparative synthesis.");
+        if (!ignore) {
+          setError("Could not load comparative synthesis.");
+        }
       } finally {
-        setLoading(false);
+        if (!ignore) {
+          setLoading(false);
+        }
       }
     };
 
     fetchSynthesis();
+    return () => {
+      ignore = true;
+    };
   }, [isOpen, cluster]);
 
   const handleRefreshSynthesis = async () => {

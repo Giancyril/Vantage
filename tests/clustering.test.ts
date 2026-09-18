@@ -52,6 +52,12 @@ export async function runClusteringTests() {
   const simOverlap = jaccardTitleSimilarity(titleA, titleB);
   assert(simOverlap >= 0.5, `Expected high lexical overlap, got ${simOverlap}`);
 
+  console.log("--> Testing articleSimilarity & keyword fingerprinting...");
+  const fp = extractKeywordFingerprint(titleA, "reasoning tokens and models");
+  assert(fp.size > 0, "Fingerprint should have non-zero terms");
+  const overallSim = articleSimilarity(titleA, "summary test", titleB, "summary test");
+  assert(overallSim > 0.4, "Article similarity should be above threshold");
+
   const simZero = jaccardTitleSimilarity(titleA, titleC);
   assertEqual(simZero, 0, "Unrelated headlines must have zero jaccard overlap");
 
