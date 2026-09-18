@@ -84,6 +84,38 @@ export const feedSources = pgTable("feed_sources", {
   updatedAt:     timestamp("updated_at").defaultNow().notNull(),
 }, (t) => [index("feed_sources_user_idx").on(t.userId), index("feed_sources_url_idx").on(t.url)]);
 
+// -- Story Clusters (groups of articles covering the same event) -------------
+export const storyClusters = pgTable("story_clusters", {
+  id:                uuid("id").primaryKey().defaultRandom(),
+  userId:            uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  headline:          text("headline").notNull(),
+  summary:           text("summary").notNull(),
+  perspectives:      jsonb("perspectives").default([]),        // [{source, angle, sentiment}]
+  consensus:         text("consensus"),                        // shared consensus across sources
+  contradictions:    jsonb("contradictions").default([]),      // [{claim, sources}]
+  biasRatings:       jsonb("bias_ratings").default({}),        // {source: "left"|"center"|"right"}
+  topic:             text("topic"),
+  articleCount:      integer("article_count").notNull().default(0),
+  relevanceScore:    real("relevance_score").notNull().default(0),
+  clusterKey:        text("cluster_key").notNull(),            // hash of canonical title keywords
+  synthesizedAt:     timestamp("synthesized_at"),
+  createdAt:         timestamp("created_at").defaultNow().notNull(),
+  updatedAt:         timestamp("updated_at").defaultNow().notNull(),
+}, (t) => [
+  index("clusters_user_idx").on(t.userId),
+  index("clusters_key_idx").on(t.clusterKey),
+]);
+
+// -- Cluster Articles (junction: which articles belong to a cluster) ----------
+export const clusterArticles = pgTable("cluster_articles", {
+  id:         uuid("id").primaryKey().defaultRandom(),
+  clusterId:  uuid("cluster_id").notNull().references(() => storyClusters.id, { onDelete: "cascade" }),
+  articleUrl: text("article_url").notNull().references(() => articles.url),
+  source:     text("source").notNull(),
+  rank:       integer("rank").notNull().default(0),
+  addedAt:    timestamp("added_at").defaultNow().notNull(),
+}, (t) => [index("cluster_articles_cluster_idx").on(t.clusterId)]);
+
 // -- Type exports -------------------------------------------------------------
 export type User            = typeof users.$inferSelect;
 export type NewUser         = typeof users.$inferInsert;
@@ -98,3 +130,7 @@ export type NewDigestItem   = typeof digestItems.$inferInsert;
 export type EngagementEvent = typeof engagementEvents.$inferSelect;
 export type FeedSource    = typeof feedSources.$inferSelect;
 export type NewFeedSource = typeof feedSources.$inferInsert;
+export type StoryCluster    = typeof storyClusters.$inferSelect;
+export type NewStoryCluster = typeof storyClusters.$inferInsert;
+export type ClusterArticle    = typeof clusterArticles.$inferSelect;
+export type NewClusterArticle = typeof clusterArticles.$inferInsert;
