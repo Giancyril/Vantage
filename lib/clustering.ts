@@ -1,5 +1,5 @@
 import { db, hasDatabase } from "@/lib/db";
-import { articles, storyClusters, clusterArticles, StoryCluster } from "@/db/schema";
+import { articles, storyClusters, clusterArticles, type StoryCluster } from "@/db/schema";
 import { eq, and, desc } from "drizzle-orm";
 import { articleSimilarity, generateClusterKey } from "./similarity";
 
