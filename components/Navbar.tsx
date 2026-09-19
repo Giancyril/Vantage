@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { AskVantageButton } from "@/components/AskVantageButton";
 import { usePathname, useRouter } from "next/navigation";
 import {
   Newspaper,
@@ -101,6 +102,11 @@ export function Navbar() {
             </span>
           )}
 
+          <AskVantageButton
+            variant="pill"
+            label="Ask Vantage"
+            context={{ mode: "general" }}
+          />
           <button
             onClick={handleRunPipeline}
             disabled={isRunning}

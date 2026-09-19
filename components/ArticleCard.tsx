@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { ExternalLink, Bookmark, ThumbsUp, ThumbsDown, Check } from "lucide-react";
 import { WhyItMatters } from "@/components/WhyItMatters";
+import { AskVantageButton } from "@/components/AskVantageButton";
 
 export interface ArticleCardProps {
   url: string;
@@ -138,6 +139,18 @@ export function ArticleCard({
         </div>
 
         <div className="flex items-center space-x-2">
+          <AskVantageButton
+            variant="inline"
+            label="Ask Vantage"
+            context={{
+              mode: "article",
+              articleUrl: url,
+              articleTitle: title,
+              articleSummary: summary,
+              articleSource: source,
+              topic: matchedTopic,
+            }}
+          />
           {toastMsg && (
             <span className="text-[11px] text-[#2C6E49] font-medium animate-pulse-subtle">
               {toastMsg}

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Navbar } from "@/components/Navbar";
+import { AskVantageButton } from "@/components/AskVantageButton";
 
 export const metadata: Metadata = {
   title: "VANTAGE — Personalized AI News Intelligence",
@@ -19,6 +20,7 @@ export default function RootLayout({
         <main className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
           {children}
         </main>
+        <AskVantageButton variant="floating" />
       </body>
     </html>
   );
