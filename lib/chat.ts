@@ -341,3 +341,20 @@ export function getSuggestedPrompts(context: ChatContext): string[] {
     "Give me a 60-second executive briefing",
   ];
 }
+
+export async function deleteChatSession(sessionId: string, userId: string): Promise<boolean> {
+  inMemorySessions.delete(sessionId);
+
+  if (hasDatabase) {
+    try {
+      await db
+        .delete(chatSessions)
+        .where(eq(chatSessions.id, sessionId));
+      return true;
+    } catch (e) {
+      console.warn("DB session delete failed:", e);
+      return false;
+    }
+  }
+  return true;
+}
