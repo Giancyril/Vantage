@@ -116,6 +116,30 @@ export const clusterArticles = pgTable("cluster_articles", {
   addedAt:    timestamp("added_at").defaultNow().notNull(),
 }, (t) => [index("cluster_articles_cluster_idx").on(t.clusterId)]);
 
+
+// -- Chat Sessions (Ask Vantage conversation sessions) -----------------------
+export const chatSessions = pgTable("chat_sessions", {
+  id:           uuid("id").primaryKey().defaultRandom(),
+  userId:       uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  title:        text("title").notNull().default("Ask Vantage"),
+  context:      jsonb("context").default({}),   // { articleUrl?, clusterKey?, topic? }
+  mode:         text("mode").notNull().default("general"), // general | article | cluster | digest
+  messageCount: integer("message_count").notNull().default(0),
+  createdAt:    timestamp("created_at").defaultNow().notNull(),
+  updatedAt:    timestamp("updated_at").defaultNow().notNull(),
+}, (t) => [index("chat_sessions_user_idx").on(t.userId)]);
+
+// -- Chat Messages -----------------------------------------------------------
+export const chatMessages = pgTable("chat_messages", {
+  id:         uuid("id").primaryKey().defaultRandom(),
+  sessionId:  uuid("session_id").notNull().references(() => chatSessions.id, { onDelete: "cascade" }),
+  role:       text("role").notNull(),  // user | assistant | system
+  content:    text("content").notNull(),
+  citations:  jsonb("citations").default([]),   // [{url, title, source}]
+  tokenCount: integer("token_count").default(0),
+  createdAt:  timestamp("created_at").defaultNow().notNull(),
+}, (t) => [index("chat_messages_session_idx").on(t.sessionId)]);
+
 // -- Type exports -------------------------------------------------------------
 export type User            = typeof users.$inferSelect;
 export type NewUser         = typeof users.$inferInsert;
@@ -134,3 +158,8 @@ export type StoryCluster    = typeof storyClusters.$inferSelect;
 export type NewStoryCluster = typeof storyClusters.$inferInsert;
 export type ClusterArticle    = typeof clusterArticles.$inferSelect;
 export type NewClusterArticle = typeof clusterArticles.$inferInsert;
+
+export type ChatSession    = typeof chatSessions.$inferSelect;
+export type NewChatSession = typeof chatSessions.$inferInsert;
+export type ChatMessage    = typeof chatMessages.$inferSelect;
+export type NewChatMessage = typeof chatMessages.$inferInsert;
