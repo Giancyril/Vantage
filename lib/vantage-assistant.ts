@@ -45,7 +45,7 @@ export async function generateVantageResponse(
 
       const answer = completion.choices[0]?.message?.content;
       if (answer) {
-        const citations = extractCitations(context, answer);
+        const citations = extractCitations(context);
         return {
           answer,
           citations,
@@ -58,10 +58,10 @@ export async function generateVantageResponse(
   }
 
   // Fallback to grounded analytical reasoning engine
-  return generateAnalyticalResponse(userMessage, context, history);
+  return generateAnalyticalResponse(userMessage, context);
 }
 
-function extractCitations(context: ChatContext, _answer: string): ChatCitation[] {
+function extractCitations(context: ChatContext): ChatCitation[] {
   const citations: ChatCitation[] = [];
 
   if (context.articleUrl && context.articleTitle) {
@@ -81,8 +81,7 @@ function extractCitations(context: ChatContext, _answer: string): ChatCitation[]
  */
 function generateAnalyticalResponse(
   userQuery: string,
-  context: ChatContext,
-  _history: ChatMsg[]
+  context: ChatContext
 ): AssistantResponse {
   const q = userQuery.toLowerCase();
   const title = context.articleTitle || "this topic";

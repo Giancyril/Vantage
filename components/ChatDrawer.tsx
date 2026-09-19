@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
   X,
   Sparkles,
@@ -31,10 +31,10 @@ export function ChatDrawer({
   onClose,
   context = { mode: "general" },
   initialMessage,
-  sessionId: initialSessionId,
+  sessionId: propSessionId,
   onSessionChange,
 }: ChatDrawerProps) {
-  const [sessionId, setSessionId] = useState<string | undefined>(initialSessionId);
+  const [sessionId, setSessionId] = useState<string | undefined>(propSessionId);
   const [messages, setMessages] = useState<ChatMsg[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -44,17 +44,66 @@ export function ChatDrawer({
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const initialSentRef = useRef(false);
 
-  // Sync internal sessionId when prop changes
+  const handleSend = useCallback(
+    async (messageText?: string) => {
+      const textToSend = messageText !== undefined ? messageText : input;
+      if (!textToSend.trim() || loading) return;
+
+      const userMessageContent = textToSend.trim();
+      setInput("");
+      setError(null);
+
+      // Optimistically add user message
+      const tempUserMsg: ChatMsg = {
+        role: "user",
+        content: userMessageContent,
+        createdAt: new Date().toISOString(),
+      };
+      setMessages((prev) => [...prev, tempUserMsg]);
+      setLoading(true);
+
+      try {
+        const res = await fetch("/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            message: userMessageContent,
+            sessionId,
+            context,
+          }),
+        });
+
+        if (!res.ok) {
+          const data = await res.json();
+          throw new Error(data.error || "Failed to send message");
+        }
+
+        const data = await res.json();
+        if (data.sessionId && data.sessionId !== sessionId) {
+          setSessionId(data.sessionId);
+          onSessionChange?.(data.sessionId);
+        }
+
+        setMessages((prev) => [...prev, data.message]);
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : "Error sending message";
+        setError(msg);
+      } finally {
+        setLoading(false);
+        setTimeout(() => inputRef.current?.focus(), 100);
+      }
+    },
+    [input, loading, sessionId, context, onSessionChange]
+  );
+
+  // Load session or initialize when opened or when propSessionId changes
   useEffect(() => {
-    if (initialSessionId !== undefined) {
-      setSessionId(initialSessionId);
+    if (!isOpen) {
+      initialSentRef.current = false;
+      return;
     }
-  }, [initialSessionId]);
-
-  // Load session or initialize when opened
-  useEffect(() => {
-    if (!isOpen) return;
 
     let ignore = false;
 
@@ -75,15 +124,16 @@ export function ChatDrawer({
 
     fetchRecentSessions();
 
-    // If we already have a sessionId, fetch messages
-    if (sessionId) {
+    const targetSessionId = propSessionId ?? sessionId;
+    if (targetSessionId) {
       const loadSession = async () => {
         try {
-          const res = await fetch(`/api/chat/sessions?sessionId=${sessionId}`);
+          const res = await fetch(`/api/chat/sessions?sessionId=${targetSessionId}`);
           if (res.ok) {
             const data = await res.json();
             if (!ignore && data.session) {
               setMessages(data.session.messages || []);
+              setSessionId(targetSessionId);
             }
           }
         } catch (e) {
@@ -91,9 +141,6 @@ export function ChatDrawer({
         }
       };
       loadSession();
-    } else {
-      // Clear messages for brand new session
-      setMessages([]);
     }
 
     // Auto-focus input
@@ -104,68 +151,23 @@ export function ChatDrawer({
     return () => {
       ignore = true;
     };
-  }, [isOpen, sessionId]);
+  }, [isOpen, propSessionId, sessionId]);
 
-  // Auto-send initialMessage if provided and fresh session
+  // Trigger initial message once if provided
   useEffect(() => {
-    if (isOpen && initialMessage && messages.length === 0 && !loading) {
-      handleSend(initialMessage);
+    if (isOpen && initialMessage && !initialSentRef.current) {
+      initialSentRef.current = true;
+      const timer = setTimeout(() => {
+        handleSend(initialMessage);
+      }, 50);
+      return () => clearTimeout(timer);
     }
-  }, [isOpen, initialMessage]);
+  }, [isOpen, initialMessage, handleSend]);
 
   // Auto-scroll to bottom on new message
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, loading]);
-
-  const handleSend = async (messageText?: string) => {
-    const textToSend = messageText !== undefined ? messageText : input;
-    if (!textToSend.trim() || loading) return;
-
-    const userMessageContent = textToSend.trim();
-    setInput("");
-    setError(null);
-
-    // Optimistically add user message
-    const tempUserMsg: ChatMsg = {
-      role: "user",
-      content: userMessageContent,
-      createdAt: new Date().toISOString(),
-    };
-    setMessages((prev) => [...prev, tempUserMsg]);
-    setLoading(true);
-
-    try {
-      const res = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          message: userMessageContent,
-          sessionId,
-          context,
-        }),
-      });
-
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || "Failed to send message");
-      }
-
-      const data = await res.json();
-      if (data.sessionId && data.sessionId !== sessionId) {
-        setSessionId(data.sessionId);
-        onSessionChange?.(data.sessionId);
-      }
-
-      setMessages((prev) => [...prev, data.message]);
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Error sending message";
-      setError(msg);
-    } finally {
-      setLoading(false);
-      setTimeout(() => inputRef.current?.focus(), 100);
-    }
-  };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -384,7 +386,7 @@ export function ChatDrawer({
                         key={idx}
                         type="button"
                         onClick={() => handleSend(prompt)}
-                        className="p-2.5 rounded-xl bg-white border border-[#E8E4DC] hover:border-amber-400 hover:bg-amber-50/40 text-xs text-[#2E2C29] transition-all flex items-center justify-between group shadow-2xs"
+                        className="p-2.5 rounded-xl bg-white border border-[#E8E4DC] hover:border-amber-400 hover:bg-amber-50/40 text-xs text-[#2E2C29] transition-all flex items-center justify-between group shadow-2xs cursor-pointer"
                       >
                         <span>{prompt}</span>
                         <Send className="w-3 h-3 text-[#7A746B] group-hover:text-amber-600 transition-colors shrink-0" />
@@ -447,7 +449,7 @@ export function ChatDrawer({
                 type="button"
                 onClick={() => handleSend()}
                 disabled={!input.trim() || loading}
-                className="p-2 rounded-lg bg-[#181715] text-amber-400 hover:bg-black disabled:opacity-30 disabled:cursor-not-allowed transition-all shrink-0 shadow-xs"
+                className="p-2 rounded-lg bg-[#181715] text-amber-400 hover:bg-black disabled:opacity-30 disabled:cursor-not-allowed transition-all shrink-0 shadow-xs cursor-pointer"
                 title="Send Message"
               >
                 <Send className="w-4 h-4" />

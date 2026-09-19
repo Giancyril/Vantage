@@ -5,7 +5,28 @@
 
 import { db, hasDatabase } from "@/lib/db";
 import { chatSessions, chatMessages } from "@/db/schema";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, and } from "drizzle-orm";
+interface ChatMessageRow {
+  id: string;
+  sessionId: string;
+  role: string;
+  content: string;
+  citations: unknown;
+  tokenCount: number;
+  createdAt: Date;
+}
+
+interface ChatSessionRow {
+  id: string;
+  userId: string;
+  title: string;
+  context: unknown;
+  mode: string;
+  messageCount: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 
 // --- Types -------------------------------------------------------------------
 
@@ -81,7 +102,7 @@ export async function createChatSession(
         .values({
           userId,
           title: sessionTitle,
-          context: context as Record<string, unknown>,
+          context: (context as unknown as Record<string, unknown>),
           mode: context.mode,
           messageCount: 0,
         })
@@ -127,7 +148,7 @@ export async function getChatSession(
       context: (session.context as ChatContext) || { mode: "general" },
       mode: session.mode,
       messageCount: session.messageCount,
-      messages: messages.map((m) => ({
+      messages: messages.map((m: ChatMessageRow) => ({
         id: m.id,
         role: m.role as ChatRole,
         content: m.content,
@@ -160,7 +181,7 @@ export async function listChatSessions(userId: string): Promise<ChatSessionData[
       .orderBy(desc(chatSessions.updatedAt))
       .limit(20);
 
-    return rows.map((r) => ({
+    return rows.map((r: ChatSessionRow) => ({
       id: r.id,
       title: r.title,
       context: (r.context as ChatContext) || { mode: "general" },
@@ -236,7 +257,7 @@ export async function getSessionMessages(sessionId: string): Promise<ChatMsg[]> 
       .where(eq(chatMessages.sessionId, sessionId))
       .orderBy(chatMessages.createdAt);
 
-    return rows.map((m) => ({
+    return rows.map((m: ChatMessageRow) => ({
       id: m.id,
       role: m.role as ChatRole,
       content: m.content,
@@ -349,7 +370,7 @@ export async function deleteChatSession(sessionId: string, userId: string): Prom
     try {
       await db
         .delete(chatSessions)
-        .where(eq(chatSessions.id, sessionId));
+        .where(and(eq(chatSessions.id, sessionId), eq(chatSessions.userId, userId)));
       return true;
     } catch (e) {
       console.warn("DB session delete failed:", e);
