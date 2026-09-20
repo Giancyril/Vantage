@@ -3,7 +3,8 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { ArticleCard } from "@/components/ArticleCard";
-import { Search, Sparkles, SlidersHorizontal, RefreshCw, Calendar, Loader2 } from "lucide-react";
+import { Search, Sparkles, SlidersHorizontal, RefreshCw, Calendar, Loader2, Headphones } from "lucide-react";
+import { useAudio } from "@/components/AudioProvider";
 
 interface AnalyzedStory {
   url: string;
@@ -25,6 +26,7 @@ export default function FeedPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const { briefing, isPlaying, openModal, generateAndPlay, isLoading: isAudioLoading } = useAudio();
 
   const loadFeed = useCallback(async () => {
     setIsLoading(true);
@@ -116,6 +118,31 @@ export default function FeedPage() {
         </div>
 
         <div className="flex items-center space-x-2">
+          <button
+            type="button"
+            onClick={() => {
+              if (briefing) {
+                openModal();
+              } else {
+                generateAndPlay(
+                  stories.map((s) => ({
+                    title: s.title,
+                    summary: s.summary,
+                    whyItMatters: s.whyItMatters,
+                    source: s.source,
+                    url: s.url,
+                    topic: s.matchedTopic,
+                  }))
+                );
+              }
+            }}
+            disabled={isAudioLoading}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#181715] text-white hover:bg-black transition-all shadow-xs group shrink-0 cursor-pointer disabled:opacity-60 text-xs font-medium"
+            title="Listen to Executive Briefing"
+          >
+            <Headphones className="w-3.5 h-3.5 text-amber-400 group-hover:scale-110 transition-transform" />
+            <span>{isPlaying ? "Playing Briefing" : "Listen (3 min)"}</span>
+          </button>
           <Link
             href="/interests"
             className="flex items-center space-x-1.5 px-3 py-1.5 rounded-full border border-[#D5CFBF] bg-white text-xs font-medium text-[#4A453E] hover:bg-[#FAF8F5] transition-colors"

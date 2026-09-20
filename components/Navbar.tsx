@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { AskVantageButton } from "@/components/AskVantageButton";
+import { useAudio } from "@/components/AudioProvider";
 import { usePathname, useRouter } from "next/navigation";
 import {
   Newspaper,
@@ -13,11 +14,13 @@ import {
   CheckCircle2,
   Rss,
   Layers,
+  Headphones,
 } from "lucide-react";
 
 export function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
+  const { briefing, isPlaying, openModal, generateAndPlay } = useAudio();
   const [isRunning, setIsRunning] = useState(false);
   const [runMessage, setRunMessage] = useState<string | null>(null);
 
@@ -102,6 +105,19 @@ export function Navbar() {
             </span>
           )}
 
+          <button
+            type="button"
+            onClick={() => {
+              if (briefing) openModal();
+              else generateAndPlay();
+            }}
+            className={`p-1.5 rounded-full text-[#625C54] hover:text-[#181715] hover:bg-[#ECE8E0] transition-colors cursor-pointer ${
+              isPlaying ? "text-[#C35824] bg-[#FEF8F4]" : ""
+            }`}
+            title={isPlaying ? "Now Playing Executive Briefing" : "Listen to Executive Briefing (Audio)"}
+          >
+            <Headphones className="w-4 h-4" />
+          </button>
           <AskVantageButton
             variant="pill"
             label="Ask Vantage"
