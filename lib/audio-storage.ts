@@ -176,7 +176,7 @@ export async function listAudioBriefings(
 
     if (rows.length === 0) return memList;
 
-    return rows.map((r) => mapRowToRecord(r as AudioBriefingRow));
+    return rows.map((r: AudioBriefingRow) => mapRowToRecord(r));
   } catch (e) {
     console.warn("DB listAudioBriefings failed:", e);
     return memList;

@@ -42,6 +42,19 @@ export interface BriefingArticleInput {
 const WORDS_PER_SECOND = 2.4;
 
 /**
+ * Converts an ArrayBuffer to a base64 string universally across Node and browser environments.
+ */
+function arrayBufferToBase64(buffer: ArrayBuffer): string {
+  const bytes = new Uint8Array(buffer);
+  let binary = "";
+  const len = bytes.byteLength;
+  for (let i = 0; i < len; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binary);
+}
+
+/**
  * Generates an executive briefing script from a list of curated stories.
  * Breaks the narrative into discrete, timestamp-aligned segments.
  */
@@ -151,8 +164,8 @@ export async function synthesizeBriefingAudio(
         speed: 1.0,
       });
 
-      const buffer = Buffer.from(await mp3Response.arrayBuffer());
-      const base64Audio = `data:audio/mp3;base64,${buffer.toString("base64")}`;
+      const arrayBuf = await mp3Response.arrayBuffer();
+      const base64Audio = `data:audio/mp3;base64,${arrayBufferToBase64(arrayBuf)}`;
       const wordCount = script.split(/\s+/).length;
       const durationSeconds = Math.max(20, Math.round(wordCount / WORDS_PER_SECOND));
 
@@ -187,41 +200,49 @@ function generateProceduralAudioFallback(script: string): SynthesizedAudioResult
   const wordCount = script.split(/\s+/).length;
   const durationSeconds = Math.max(30, Math.min(180, Math.round(wordCount / WORDS_PER_SECOND)));
 
-  // Generate a valid 44.1kHz mono WAV audio file with soft chime chords
   const sampleRate = 8000;
-  const totalSamples = sampleRate * Math.min(durationSeconds, 20); // sample representation
+  const totalSamples = sampleRate * Math.min(durationSeconds, 20);
   const headerSize = 44;
-  const buffer = Buffer.alloc(headerSize + totalSamples);
+  const buffer = new ArrayBuffer(headerSize + totalSamples);
+  const view = new DataView(buffer);
+
+  // Helper to write ASCII strings
+  const writeString = (offset: number, str: string) => {
+    for (let i = 0; i < str.length; i++) {
+      view.setUint8(offset + i, str.charCodeAt(i));
+    }
+  };
 
   // RIFF chunk
-  buffer.write("RIFF", 0);
-  buffer.writeUInt32LE(36 + totalSamples, 4);
-  buffer.write("WAVE", 8);
+  writeString(0, "RIFF");
+  view.setUint32(4, 36 + totalSamples, true);
+  writeString(8, "WAVE");
 
   // fmt chunk
-  buffer.write("fmt ", 12);
-  buffer.writeUInt32LE(16, 16); // subchunk size
-  buffer.writeUInt16LE(1, 20);  // audio format (1 = PCM)
-  buffer.writeUInt16LE(1, 22);  // num channels (1 = mono)
-  buffer.writeUInt32LE(sampleRate, 24); // sample rate
-  buffer.writeUInt32LE(sampleRate, 28); // byte rate
-  buffer.writeUInt16LE(1, 32);  // block align
-  buffer.writeUInt16LE(8, 34);  // bits per sample
+  writeString(12, "fmt ");
+  view.setUint32(16, 16, true);          // subchunk size
+  view.setUint16(20, 1, true);           // audio format (1 = PCM)
+  view.setUint16(22, 1, true);           // num channels (1 = mono)
+  view.setUint32(24, sampleRate, true);  // sample rate
+  view.setUint32(28, sampleRate, true);  // byte rate
+  view.setUint16(32, 1, true);           // block align
+  view.setUint16(34, 8, true);           // bits per sample
 
   // data chunk
-  buffer.write("data", 36);
-  buffer.writeUInt32LE(totalSamples, 40);
+  writeString(36, "data");
+  view.setUint32(40, totalSamples, true);
 
   // Fill audio samples with gentle harmonic waves (220Hz harmonic chime)
+  const bytes = new Uint8Array(buffer);
   for (let i = 0; i < totalSamples; i++) {
     const t = i / sampleRate;
     const decay = Math.exp(-(t % 4));
     const tone = Math.sin(2 * Math.PI * 220 * t) * 0.3 + Math.sin(2 * Math.PI * 440 * t) * 0.15;
     const sample = Math.round(128 + 127 * tone * decay);
-    buffer.writeUInt8(Math.max(0, Math.min(255, sample)), headerSize + i);
+    bytes[headerSize + i] = Math.max(0, Math.min(255, sample));
   }
 
-  const base64Wav = `data:audio/wav;base64,${buffer.toString("base64")}`;
+  const base64Wav = `data:audio/wav;base64,${arrayBufferToBase64(buffer)}`;
 
   return {
     audioUrl: base64Wav,

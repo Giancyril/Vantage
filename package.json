@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "npx tsx tests/clustering.test.ts && npx tsx tests/chat.test.ts"
+    "test": "npx tsx tests/clustering.test.ts && npx tsx tests/chat.test.ts && npx tsx tests/audio.test.ts"
   },
   "dependencies": {
     "@react-email/components": "^1.0.12",

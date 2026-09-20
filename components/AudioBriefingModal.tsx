@@ -2,7 +2,7 @@
 
 import React, { useEffect, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
-import { X, Headphones, Sparkles, RefreshCw, Volume2 } from "lucide-react";
+import { X, Headphones, Sparkles, RefreshCw } from "lucide-react";
 import { WaveVisualizer } from "@/components/WaveVisualizer";
 import { AudioPlayerControls } from "@/components/AudioPlayerControls";
 import { SynchronizedTranscript } from "@/components/SynchronizedTranscript";
