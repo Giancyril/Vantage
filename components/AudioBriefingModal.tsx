@@ -2,7 +2,7 @@
 
 import React, { useEffect, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
-import { X, Headphones, Sparkles, RefreshCw } from "lucide-react";
+import { X, RefreshCw } from "lucide-react";
 import { WaveVisualizer } from "@/components/WaveVisualizer";
 import { AudioPlayerControls } from "@/components/AudioPlayerControls";
 import { SynchronizedTranscript } from "@/components/SynchronizedTranscript";
@@ -44,7 +44,7 @@ export function AudioBriefingModal({
   onRegenerate,
 }: AudioBriefingModalProps) {
   const mounted = useSyncExternalStore(
-    () => () => {},
+    () => () => { },
     () => true,
     () => false
   );
@@ -77,9 +77,6 @@ export function AudioBriefingModal({
           {/* Header */}
           <div className="px-6 py-4 bg-white border-b border-[#E8E4DC] flex items-center justify-between gap-4">
             <div className="flex items-center gap-2.5 min-w-0">
-              <div className="w-8 h-8 rounded-full bg-[#181715] flex items-center justify-center text-amber-400 shrink-0 shadow-xs">
-                <Headphones className="w-4 h-4" />
-              </div>
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
                   <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded bg-[#181715] text-white">
@@ -154,7 +151,6 @@ export function AudioBriefingModal({
           {/* Footer Info */}
           <div className="px-6 py-3 bg-[#F3F0EA] border-t border-[#E8E4DC] flex items-center justify-between text-[11px] text-[#7A746B]">
             <div className="flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-amber-600" />
               <span>Synthesized with Vantage Autonomous Reasoning & Neural Speech</span>
             </div>
             <span>Press Esc to close</span>

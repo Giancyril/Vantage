@@ -137,7 +137,7 @@ export default function FeedPage() {
               }
             }}
             disabled={isAudioLoading}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#181715] text-white hover:bg-black transition-all shadow-xs group shrink-0 cursor-pointer disabled:opacity-60 text-xs font-medium"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#181715] text-white hover:bg-black transition-all shadow-xs group shrink-0 cursor-pointer disabled:opacity-60 text-xs font-medium whitespace-nowrap"
             title="Listen to Executive Briefing"
           >
             <Headphones className="w-3.5 h-3.5 text-amber-400 group-hover:scale-110 transition-transform" />
@@ -145,15 +145,16 @@ export default function FeedPage() {
           </button>
           <Link
             href="/interests"
-            className="flex items-center space-x-1.5 px-3 py-1.5 rounded-full border border-[#D5CFBF] bg-white text-xs font-medium text-[#4A453E] hover:bg-[#FAF8F5] transition-colors"
+            className="inline-flex items-center space-x-1.5 px-2.5 py-1.5 rounded-full border border-[#D5CFBF] bg-white text-xs font-medium text-[#4A453E] hover:bg-[#FAF8F5] transition-colors whitespace-nowrap shrink-0"
+            title="Refine Topic Weights"
           >
-            <SlidersHorizontal className="w-3 h-3 text-[#706A60]" />
+            <SlidersHorizontal className="w-3 h-3 text-[#706A60] shrink-0" />
             <span>Refine Weights</span>
           </Link>
           <button
             onClick={handleRefresh}
             disabled={isRefreshing}
-            className="p-2 rounded-full border border-[#D5CFBF] bg-white text-[#4A453E] hover:bg-[#FAF8F5] transition-colors cursor-pointer disabled:opacity-50"
+            className="p-1.5 rounded-full border border-[#D5CFBF] bg-white text-[#4A453E] hover:bg-[#FAF8F5] transition-colors cursor-pointer disabled:opacity-50 shrink-0"
             title="Refresh Feed"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? "animate-spin text-[#C35824]" : ""}`} />
