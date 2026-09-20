@@ -163,3 +163,22 @@ export type ChatSession    = typeof chatSessions.$inferSelect;
 export type NewChatSession = typeof chatSessions.$inferInsert;
 export type ChatMessage    = typeof chatMessages.$inferSelect;
 export type NewChatMessage = typeof chatMessages.$inferInsert;
+
+// -- Audio Briefings (AI Executive Podcast) -----------------------------------
+export const audioBriefings = pgTable("audio_briefings", {
+  id:              uuid("id").primaryKey().defaultRandom(),
+  userId:          uuid("user_id").references(() => users.id, { onDelete: "cascade" }),
+  digestId:        uuid("digest_id"),
+  title:           text("title").notNull(),
+  durationSeconds: integer("duration_seconds").default(180).notNull(),
+  audioUrl:        text("audio_url"),
+  script:          text("script").notNull(),
+  voice:           text("voice").default("alloy").notNull(),
+  segments:        jsonb("segments").default([]).notNull(),
+  status:          text("status").default("ready").notNull(),
+  createdAt:       timestamp("created_at").defaultNow().notNull(),
+  updatedAt:       timestamp("updated_at").defaultNow().notNull(),
+}, (t) => [index("audio_briefings_user_idx").on(t.userId)]);
+
+export type AudioBriefing    = typeof audioBriefings.$inferSelect;
+export type NewAudioBriefing = typeof audioBriefings.$inferInsert;
