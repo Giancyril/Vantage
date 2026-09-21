@@ -4,6 +4,42 @@ A production-grade, AI-powered personal news intelligence system designed for pr
 
 ## Features
 
+## 5 Flagship Advanced Features
+
+Vantage is built around five core autonomous intelligence pillars engineered for information density, zero algorithmic noise, and continuous personal calibration:
+
+### 1. Adaptive Interest Vector Reweighting Engine (Continuous Learning Feedback Loop)
+- **Multi-Signal Engagement Stream**: Captures fine-grained implicit and explicit interaction signals across the reading lifecycle (`open`, `click`, `save`, `dismiss`, `more_like_this`, `less_like_this`).
+- **Bayesian Weight Calibration**: Employs an exponential decay and damping curve that dynamically elevates high-signal topics while decaying unengaging themes, preventing topic fixation and echo chambers.
+- **Transparent Interest Control**: Full-control interactive dashboard with live weight sliders (0.00–1.00), keyword badge editors, domain whitelists/blacklists, and cold-start domain presets (Technology, Finance, Science, Policy).
+- **Automated Nightly Reweighting**: Trigger.dev background cron worker recalculates interest vectors every midnight UTC, delivering an iteratively sharper feed every morning.
+
+### 2. Near-Duplicate Story Clustering & Cross-Source Perspective Synthesis
+- **Agglomerative Semantic Grouping**: Multi-tier clustering engine combining Jaccard title token overlap, category filtering, and high-dimensional cosine embedding similarity to group parallel coverage of the same event into unified story clusters.
+- **Coverage Breadth Scoring**: Quantifies reporting depth and source diversity across publications, distinguishing between breaking single-source scoops and widespread global consensus.
+- **Multi-Perspective Synthesis Engine**: Side-by-side analytical drawer surfacing how different editorial angles cover identical events, pinpointing consensus points, factual contradictions, and unique reporting.
+- **Unified Story Cluster Cards**: Replaces fragmented timeline noise with single cohesive cards featuring an expandable source explorer and primary lead story selection.
+
+### 3. Ask Vantage — Context-Aware RAG & In-Context Article Intelligence
+- **Dual Grounding Modes**: Floating slide-over intelligence drawer capable of switching dynamically between *Article Grounding* (deep-dive Q&A restricted to the current article) and *Feed Grounding* (synthesizing across all recent articles in your personal corpus).
+- **Inline Citation Verification**: Every AI claim includes clickable citation badges linking back to source URLs, authors, and extracted excerpts to ensure complete epistemic provenance.
+- **Suggested Analytical Prompts**: Contextually generated follow-up prompts ("What are the economic ramifications?", "How does this contradict yesterday's report?") for zero-friction investigative reading.
+- **Token-Streamed Persistence**: Real-time server-sent token streaming paired with durable database session persistence, allowing users to resume analytical threads at any time.
+
+### 4. AI Audio Briefing Studio with Karaoke Synchronized Transcripts
+- **Executive Audio Digest Synthesis**: Transforms daily reading feeds into narrative, podcast-style morning briefings using OpenAI's natural text-to-speech engine (`tts-1` / `alloy`/`nova`).
+- **Karaoke Sentence-Level Transcript Highlighting**: Real-time synchronized transcript panel that automatically tracks and highlights the exact sentence currently being voiced for simultaneous audio-visual retention.
+- **Interactive Scrubber & Waveform Visualizer**: CSS-animated waveform visualizer responding to playback state, complete with variable speed toggles (0.75x–2.0x), quick skip controls, and time stamps.
+- **Zero-Dependency Procedural Fallback**: Built-in procedural Web Audio synthesizer capable of rendering structural audio briefings offline without third-party API dependencies.
+
+### 5. Personal Intelligence Analytics & Adaptive Trend Radar
+- **Reading Velocity & Momentum Metrics**: Computes daily article consumption, 7-day rolling daily averages, and directional velocity trends (`up`, `down`, `flat`).
+- **Adaptive Trend Radar (Emergent Keywords)**: Animated bubble cloud visualizing emerging terms across your feed corpus, measuring percentage momentum (+% delta) and primary source attribution.
+- **30-Day Topic Trajectory SVG Chart**: Hand-crafted, zero-dependency multi-line SVG chart displaying the 30-day evolutionary path of your interest weights, equipped with an interactive hover crosshair and topic filter toggles.
+- **Knowledge Depth & Gap Detection**: Evaluates personal engagement depth against interest weights to highlight "Knowledge Gaps" (topics with high stated interest but shallow reading depth).
+- **Multi-Destination Briefing Export**: One-click export engine generating printable executive HTML/PDF briefing snapshots, syncing structured pages to Notion databases, or exporting raw JSON metrics.
+
+---
 ### Core Intelligence Engine
 - **Autonomous Multi-Source Discovery**: Fully automated news discovery pipeline that expands each interest topic into targeted search queries, runs them in parallel across Tavily News Search, and performs global URL-level deduplication to prevent repeat stories
 - **Resilient Full-Text Extraction**: Article scraping via Firecrawl with clean markdown transformation, graceful degradation for paywalled content, and scrape-failure tracking to prevent repeated failed attempts
@@ -61,6 +97,136 @@ A production-grade, AI-powered personal news intelligence system designed for pr
 
 ---
 
+## System Architecture
+
+The platform follows a modern full-stack decoupled architecture. Next.js 16 App Router powers the client and edge API layers, Trigger.dev v3 orchestrates heavy asynchronous intelligence tasks, Drizzle ORM interfaces with Supabase PostgreSQL, and OpenAI/Tavily/Firecrawl power the cognitive layer.
+
+```mermaid
+graph TD
+    subgraph Client ["Client & Presentation Layer (Next.js 16 / React 19)"]
+        FeedUI["Editorial Stream (Mailbrew/Artifact Aesthetic)"]
+        ChatDrawer["Ask Vantage (Contextual RAG Drawer)"]
+        AudioStudio["Audio Briefing Studio (Karaoke Transcript)"]
+        AnalyticsDash["Intelligence Analytics Dashboard (Trend Radar / SVG Trajectory)"]
+        InterestMgr["Transparent Interest Manager (Sliders / Presets)"]
+    end
+
+    subgraph EdgeAPI ["API Routes & Edge Layer (Next.js App Router)"]
+        FeedRoutes["/api/feed & /api/digests"]
+        FeedbackRoutes["/api/feedback (Engagement Stream)"]
+        ChatRoutes["/api/chat (Token Streaming RAG)"]
+        AudioRoutes["/api/audio/briefing & /api/audio/generate"]
+        AnalyticsRoutes["/api/analytics & /api/analytics/export"]
+    end
+
+    subgraph IntelligenceCore ["Core Intelligence & Analytics Engines"]
+        DiscoveryEngine["Discovery & Scraping (Tavily + Firecrawl)"]
+        AnalysisEngine["AI Analysis & Scoring (GPT-4o-mini + Zod)"]
+        ClusteringEngine["Semantic Story Clustering (Jaccard + Cosine)"]
+        ReweightEngine["Adaptive Interest Reweighting (Bayesian Decay)"]
+        AudioEngine["Audio Script & TTS Synthesizer"]
+        AnalyticsEngine["Personal Intelligence Engine (Velocity / Radar / Depth)"]
+    end
+
+    subgraph BackgroundTasks ["Asynchronous Task Orchestration (Trigger.dev v3)"]
+        IngestionCron["Nightly Ingestion Pipeline (6:00 AM UTC)"]
+        ReweightJob["Daily Interest Vector Calibration Job"]
+        SnapshotJob["Daily Analytics Snapshot Job"]
+        EmailWorker["React Email Compilation & Resend Dispatch"]
+    end
+
+    subgraph PersistenceExternal ["Persistence, AI & External Providers"]
+        DB[(Supabase PostgreSQL / Drizzle ORM)]
+        OpenAIAPI["OpenAI API (GPT-4o-mini, Embeddings, TTS)"]
+        TavilyAPI["Tavily Search API (High-Signal News)"]
+        FirecrawlAPI["Firecrawl API (Full-Text Extraction)"]
+        ResendAPI["Resend Email Service"]
+        NotionAPI["Notion API (Workspace Sync)"]
+    end
+
+    %% Client to Edge
+    FeedUI <--> FeedRoutes
+    ChatDrawer <--> ChatRoutes
+    AudioStudio <--> AudioRoutes
+    AnalyticsDash <--> AnalyticsRoutes
+    InterestMgr <--> FeedbackRoutes
+
+    %% Edge to Intelligence & DB
+    FeedRoutes --> DB
+    FeedbackRoutes --> DB
+    ChatRoutes --> AnalysisEngine
+    ChatRoutes --> DB
+    AudioRoutes --> AudioEngine
+    AudioRoutes --> DB
+    AnalyticsRoutes --> AnalyticsEngine
+    AnalyticsRoutes --> DB
+
+    %% Intelligence Core to External
+    DiscoveryEngine --> TavilyAPI
+    DiscoveryEngine --> FirecrawlAPI
+    AnalysisEngine --> OpenAIAPI
+    AudioEngine --> OpenAIAPI
+    AnalyticsEngine --> DB
+    AnalyticsRoutes --> NotionAPI
+
+    %% Background Tasks
+    IngestionCron --> DiscoveryEngine
+    IngestionCron --> AnalysisEngine
+    IngestionCron --> ClusteringEngine
+    IngestionCron --> EmailWorker
+    EmailWorker --> ResendAPI
+    ReweightJob --> ReweightEngine
+    SnapshotJob --> AnalyticsEngine
+    SnapshotJob --> DB
+    ReweightEngine --> DB
+    ClusteringEngine --> DB
+```
+
+## Module Dependency
+
+The application architecture adheres to a strict unidirectional modular flow where data ingestion, cognitive enrichment, user feedback, and presentation layers communicate through strongly-typed contracts:
+
+```mermaid
+graph LR
+    subgraph IngestionFlow ["1. Ingestion & Extraction"]
+        Tavily["Tavily Discovery"] --> Dedupe["URL / Hash Deduplication"]
+        RSS["RSS Feed Parser"] --> Dedupe
+        Dedupe --> Firecrawl["Firecrawl Full-Text Extraction"]
+    end
+
+    subgraph CognitiveFlow ["2. AI Enrichment & Synthesis"]
+        Firecrawl --> Analyzer["GPT-4o-mini Article Analyzer"]
+        Analyzer --> Scorer["Relevance & 'Why It Matters' Scorer"]
+        Scorer --> Clusterer["Agglomerative Story Clusterer"]
+        Clusterer --> Perspective["Multi-Perspective Matrix"]
+    end
+
+    subgraph PersonalizationFlow ["3. Feed Synthesis & Ranking"]
+        Perspective --> Ranker["Composite Ranking Algorithm"]
+        Interests["User Interest Vectors"] --> Ranker
+        Ranker --> DigestItems["Curated Digest Items"]
+        DigestItems --> Email["React Email Dispatch"]
+        DigestItems --> WebFeed["Editorial Web Stream"]
+    end
+
+    subgraph EngagementFlow ["4. Feedback & Adaptation Loop"]
+        WebFeed --> UserActions["Engagement Stream (Save/Click/Dismiss)"]
+        UserActions --> FeedbackLib["Feedback Engine (lib/feedback.ts)"]
+        FeedbackLib --> Reweighting["Reweighting Engine (lib/reweight.ts)"]
+        Reweighting --> Interests
+    end
+
+    subgraph MultimodalFlow ["5. Multimodal Intelligence & Analytics"]
+        WebFeed --> ChatRAG["Ask Vantage RAG Engine (lib/chat.ts)"]
+        DigestItems --> AudioScript["Audio Briefing Engine (lib/audio-briefing.ts)"]
+        AudioScript --> AudioStorage["Audio Storage Layer (lib/audio-storage.ts)"]
+        UserActions --> AnalyticsEng["Analytics Engine (lib/analytics.ts)"]
+        AnalyticsEng --> Snapshots["Daily Snapshots (db/schema.ts)"]
+        AnalyticsEng --> ExportService["Export Service (PDF / Notion / JSON)"]
+    end
+```
+
+---
 ## Tech Stack
 
 ### Backend & Infrastructure
@@ -415,6 +581,23 @@ The audio briefing system transforms the daily text digest into a narrated liste
 - **Incremental Sync**: Timestamp-based incremental feed processing preventing redundant article reanalysis
 
 ---
+
+### Phase 7 — Personal Intelligence Analytics & Adaptive Trend Radar ✅
+- **Personal Intelligence Analytics Engine (`lib/analytics.ts`)**: Reading velocity (today, 7d-average, trend), 30-day topic weight trajectories, emergent keyword delta detection, knowledge depth composite scoring, and gap detection
+- **Daily Persistence Schema (`analyticsSnapshots` in `db/schema.ts`)**: Stores daily computed snapshots with JSONB metrics for topic weights, engagement breakdown, emergent terms, and top articles
+- **Unified Analytics Endpoints**: `GET /api/analytics` returning complete dashboard metrics and `POST /api/analytics/snapshot` for on-demand/nightly persistence
+- **Hand-Crafted Zero-Dependency Visualizations**:
+  - `EmergentKeywordRadar.tsx`: Animated bubble cloud visualizing trending keywords with velocity colors and momentum deltas
+  - `TopicWeightChart.tsx`: Multi-line SVG chart with 30-day trajectories, interactive hover crosshair, and topic filters
+  - `KnowledgeDepthBar.tsx`: Dual-bar component showing depth vs. weight with knowledge gap warning indicators
+  - `StatCard.tsx` & `TrendSparkline.tsx`: High-contrast metric cards with status glows and inline trend lines
+- **Interactive `/analytics` Dashboard Page**: Full intelligence dashboard with live refresh, manual snapshot trigger, and Navbar integration
+- **Multi-Destination Briefing Export (`/api/analytics/export`)**:
+  - Printable executive HTML/PDF briefing snapshot styled for print media
+  - Notion workspace sync pushing structured blocks to user databases
+  - Raw JSON metric download
+- **Automated Test Suite (`tests/analytics.test.ts`)**: 6-part test suite validating velocity, weight history, emergent keywords, depth/gaps, dashboard payload, and snapshot persistence idempotency
+
 
 ## License
 
