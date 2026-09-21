@@ -164,6 +164,27 @@ export type NewChatSession = typeof chatSessions.$inferInsert;
 export type ChatMessage    = typeof chatMessages.$inferSelect;
 export type NewChatMessage = typeof chatMessages.$inferInsert;
 
+
+// -- Analytics Snapshots (daily persisted analytics metrics) -----------------
+export const analyticsSnapshots = pgTable("analytics_snapshots", {
+  id:                   uuid("id").primaryKey().defaultRandom(),
+  userId:               uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  date:                 text("date").notNull(),  // YYYY-MM-DD — one row per user per day
+  topicWeights:         jsonb("topic_weights").default({}).notNull(),       // { topic: weight }
+  engagementSummary:    jsonb("engagement_summary").default({}).notNull(),  // { open, save, click, dismiss, more_like_this }
+  emergentKeywords:     jsonb("emergent_keywords").default([]).notNull(),   // [{ keyword, delta, score }]
+  velocityScore:        real("velocity_score").default(0).notNull(),        // 7-day rolling avg articles/day
+  knowledgeDepthByTopic: jsonb("knowledge_depth_by_topic").default({}).notNull(), // { topic: depth_score }
+  topArticlesByScore:   jsonb("top_articles_by_score").default([]).notNull(), // [{ url, title, score }]
+  createdAt:            timestamp("created_at").defaultNow().notNull(),
+}, (t) => [
+  index("analytics_user_idx").on(t.userId),
+  index("analytics_date_idx").on(t.date),
+]);
+
+export type AnalyticsSnapshot    = typeof analyticsSnapshots.$inferSelect;
+export type NewAnalyticsSnapshot = typeof analyticsSnapshots.$inferInsert;
+
 // -- Audio Briefings (AI Executive Podcast) -----------------------------------
 export const audioBriefings = pgTable("audio_briefings", {
   id:              uuid("id").primaryKey().defaultRandom(),
