@@ -15,6 +15,7 @@ import {
   Rss,
   Layers,
   Headphones,
+  BarChart2,
 } from "lucide-react";
 
 export function Navbar() {
@@ -29,6 +30,7 @@ export function Navbar() {
     { label: "Clusters", href: "/clusters", icon: Layers },
     { label: "Interests", href: "/interests", icon: Sliders },
     { label: "Sources", href: "/sources", icon: Rss },
+    { label: "Analytics", href: "/analytics", icon: BarChart2 },
     { label: "Saved", href: "/saved", icon: Bookmark },
     { label: "Archive", href: "/digests", icon: History },
   ];

@@ -40,10 +40,11 @@ export function KnowledgeDepthBar({ entries, onSelectTopic }: KnowledgeDepthBarP
             <div className="flex items-center justify-between mb-1.5">
               <span className="text-xs font-semibold text-[#181715] flex items-center gap-1.5">
                 {entry.gap && (
-                  <AlertTriangle
-                    className="w-3.5 h-3.5 text-[#D97706] shrink-0"
-                    title="Knowledge gap: high interest, low engagement"
-                  />
+                  <span title="Knowledge gap: high interest, low engagement" className="inline-flex items-center">
+                    <AlertTriangle
+                      className="w-3.5 h-3.5 text-[#D97706] shrink-0"
+                    />
+                  </span>
                 )}
                 <span className="truncate max-w-[160px]">{entry.topic}</span>
               </span>

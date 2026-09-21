@@ -14,6 +14,7 @@ import {
   digestItems,
   articles,
   type AnalyticsSnapshot,
+  type EngagementEvent,
 } from "@/db/schema";
 import { eq, and, gte, desc } from "drizzle-orm";
 import { getRecentEngagementEvents } from "@/lib/feedback";
@@ -85,7 +86,7 @@ const inMemorySnapshots: AnalyticsSnapshot[] = [];
 /**
  * Get all engagement events for a user within a time window (in days).
  */
-async function fetchEvents(userId: string, days: number = 30) {
+async function fetchEvents(userId: string, days: number = 30): Promise<EngagementEvent[]> {
   const cutoff = new Date();
   cutoff.setDate(cutoff.getDate() - days);
 
@@ -119,10 +120,10 @@ export async function getReadingVelocity(userId: string): Promise<{
   trend: "up" | "down" | "flat";
 }> {
   const events = await fetchEvents(userId, 14);
-  const readEvents = events.filter((e) => e.eventType === "click" || e.eventType === "open");
+  const readEvents = events.filter((e: EngagementEvent) => e.eventType === "click" || e.eventType === "open");
 
   const today = new Date().toISOString().slice(0, 10);
-  const todayCount = readEvents.filter((e) =>
+  const todayCount = readEvents.filter((e: EngagementEvent) =>
     new Date(e.createdAt).toISOString().slice(0, 10) === today
   ).length;
 
@@ -186,7 +187,7 @@ export async function getTopicWeightHistory(
         .orderBy(desc(analyticsSnapshots.createdAt));
 
       if (snapshots.length > 0) {
-        return snapshots.map((s) => ({
+        return snapshots.map((s: AnalyticsSnapshot) => ({
           date: s.date,
           weights: (s.topicWeights as Record<string, number>) ?? {},
         }));
@@ -243,25 +244,25 @@ export async function getEmergentKeywords(
   // Simulate keyword trending based on interest weights and engagement
   const events = await fetchEvents(userId, windowDays * 2);
   const currentWindow = events.filter(
-    (e) => new Date(e.createdAt) >= (() => { const d = new Date(); d.setDate(d.getDate() - windowDays); return d; })()
+    (e: EngagementEvent) => new Date(e.createdAt) >= (() => { const d = new Date(); d.setDate(d.getDate() - windowDays); return d; })()
   );
-  const previousWindow = events.filter((e) => {
+  const previousWindow = events.filter((e: EngagementEvent) => {
     const d = new Date(e.createdAt);
     const start = new Date(); start.setDate(start.getDate() - windowDays * 2);
     const end = new Date(); end.setDate(end.getDate() - windowDays);
     return d >= start && d < end;
   });
 
-  const currentMeta = currentWindow.map((e) => JSON.stringify(e.metadata ?? {}));
-  const previousMeta = previousWindow.map((e) => JSON.stringify(e.metadata ?? {}));
+  const currentMeta = currentWindow.map((e: EngagementEvent) => JSON.stringify(e.metadata ?? {}));
+  const previousMeta = previousWindow.map((e: EngagementEvent) => JSON.stringify(e.metadata ?? {}));
 
   const results: EmergentKeyword[] = [];
 
   for (const keyword of allKeywords.slice(0, 30)) {
-    const currentCount = currentMeta.filter((m) =>
+    const currentCount = currentMeta.filter((m: string) =>
       m.toLowerCase().includes(keyword.toLowerCase())
     ).length;
-    const previousCount = previousMeta.filter((m) =>
+    const previousCount = previousMeta.filter((m: string) =>
       m.toLowerCase().includes(keyword.toLowerCase())
     ).length;
 
@@ -293,15 +294,15 @@ export async function getKnowledgeDepth(userId: string): Promise<KnowledgeDepthE
 
   for (const interest of userInterests) {
     // Events related to this topic (via metadata.topic field)
-    const topicEvents = events.filter((e) => {
+    const topicEvents = events.filter((e: EngagementEvent) => {
       const meta = (e.metadata ?? {}) as Record<string, unknown>;
       return meta.topic === interest.topic;
     });
 
-    const saves = topicEvents.filter((e) => e.eventType === "save").length;
-    const clicks = topicEvents.filter((e) => e.eventType === "click").length;
-    const moreLike = topicEvents.filter((e) => e.eventType === "more_like_this").length;
-    const dismisses = topicEvents.filter((e) => e.eventType === "dismiss").length;
+    const saves = topicEvents.filter((e: EngagementEvent) => e.eventType === "save").length;
+    const clicks = topicEvents.filter((e: EngagementEvent) => e.eventType === "click").length;
+    const moreLike = topicEvents.filter((e: EngagementEvent) => e.eventType === "more_like_this").length;
+    const dismisses = topicEvents.filter((e: EngagementEvent) => e.eventType === "dismiss").length;
 
     // Weighted depth score
     const rawDepth = saves * 0.4 + clicks * 0.3 + moreLike * 0.5 - dismisses * 0.2;
@@ -403,7 +404,7 @@ export async function computeDailyMetrics(userId: string, days = 30): Promise<An
       fetchEvents(userId, days),
     ]);
 
-  const savedCount = events.filter((e) => e.eventType === "save").length;
+  const savedCount = events.filter((e: EngagementEvent) => e.eventType === "save").length;
   const activeTopics = knowledgeDepth.filter((d) => d.articleCount > 0).length;
 
   return {
@@ -439,7 +440,7 @@ export async function snapshotAnalytics(userId: string): Promise<AnalyticsSnapsh
     userId,
     date: today,
     topicWeights,
-    engagementSummary: metrics.engagementBreakdown as Record<string, unknown>,
+    engagementSummary: metrics.engagementBreakdown as unknown as Record<string, unknown>,
     emergentKeywords: metrics.emergentKeywords as unknown[],
     velocityScore: metrics.velocity.weeklyAvg,
     knowledgeDepthByTopic,
@@ -460,7 +461,7 @@ export async function snapshotAnalytics(userId: string): Promise<AnalyticsSnapsh
           userId,
           date: today,
           topicWeights,
-          engagementSummary: metrics.engagementBreakdown as Record<string, unknown>,
+          engagementSummary: metrics.engagementBreakdown as unknown as Record<string, unknown>,
           emergentKeywords: metrics.emergentKeywords as unknown[],
           velocityScore: metrics.velocity.weeklyAvg,
           knowledgeDepthByTopic,
