@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { computeDailyMetrics, DEFAULT_USER_ID } from "@/lib/analytics";
+import type { AnalyticsDashboard } from "@/lib/analytics";
 
 export async function POST(req: NextRequest) {
   try {
@@ -22,7 +23,7 @@ export async function POST(req: NextRequest) {
     }
 
     const avgDepth = data.knowledgeDepth.length
-      ? data.knowledgeDepth.reduce((sum: number, d: any) => sum + d.depth, 0) / data.knowledgeDepth.length
+      ? data.knowledgeDepth.reduce((sum: number, d: { depth: number }) => sum + d.depth, 0) / data.knowledgeDepth.length
       : 0;
 
     if (format === "notion") {
@@ -162,21 +163,21 @@ export async function POST(req: NextRequest) {
       { success: false, error: `Unsupported export format: ${format}` },
       { status: 400 }
     );
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Export error:", error);
     return NextResponse.json(
       {
         success: false,
-        error: error.message || "Failed to generate export",
+        error: (error instanceof Error ? error.message : "Failed to generate export"),
       },
       { status: 500 }
     );
   }
 }
 
-function generateBriefingHtml(data: any, dateStr: string): string {
+function generateBriefingHtml(data: AnalyticsDashboard, dateStr: string): string {
   const avgDepth = data.knowledgeDepth?.length
-    ? data.knowledgeDepth.reduce((sum: number, d: any) => sum + d.depth, 0) / data.knowledgeDepth.length
+    ? data.knowledgeDepth.reduce((sum: number, d: { depth: number }) => sum + d.depth, 0) / data.knowledgeDepth.length
     : 0;
   return `<!DOCTYPE html>
 <html lang="en">
@@ -347,7 +348,7 @@ function generateBriefingHtml(data: any, dateStr: string): string {
           ${data.emergentKeywords
             .slice(0, 8)
             .map(
-              (kw: any) => `
+              (kw: { keyword: string; delta: number; currentCount: number; topic?: string }) => `
             <tr>
               <td><strong>${kw.keyword}</strong></td>
               <td><span style="color: ${kw.delta >= 0 ? "#16a34a" : "#dc2626"}; font-weight: 600;">${kw.delta >= 0 ? "+" : ""}${kw.delta}%</span></td>
@@ -375,7 +376,7 @@ function generateBriefingHtml(data: any, dateStr: string): string {
         <tbody>
           ${data.knowledgeDepth
             .map(
-              (kd: any) => `
+              (kd: { topic: string; depth: number; weight: number; gap: boolean }) => `
             <tr>
               <td><strong>${kd.topic}</strong></td>
               <td>${Math.round(kd.depth * 100)}%</td>

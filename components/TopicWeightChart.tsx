@@ -15,6 +15,13 @@ const TOPIC_COLORS = [
 
 type Range = "7d" | "14d" | "30d";
 
+// Layout constants
+const W = 680;
+const padL = 36;
+const padR = 12;
+const padT = 12;
+const padB = 24;
+
 export function TopicWeightChart({ data, height = 220 }: TopicWeightChartProps) {
   const svgRef = useRef<SVGSVGElement>(null);
   const [range, setRange] = useState<Range>("30d");
@@ -41,33 +48,31 @@ export function TopicWeightChart({ data, height = 220 }: TopicWeightChartProps) 
     });
   };
 
+  const innerW = W - padL - padR;
+  const innerH = height - padT - padB;
+
+  // useCallback must be called unconditionally (above any early returns)
+  const handleMouseMove = useCallback((e: React.MouseEvent<SVGSVGElement>) => {
+    if (!svgRef.current) return;
+    const rect = svgRef.current.getBoundingClientRect();
+    const scaledInnerW = innerW * (rect.width / W);
+    const xRatio = (e.clientX - rect.left - padL * (rect.width / W)) / scaledInnerW;
+    const dataLen = filteredData.length;
+    const idx = Math.round(xRatio * (dataLen - 1));
+    setCrosshair(Math.max(0, Math.min(dataLen - 1, idx)));
+  }, [filteredData.length, innerW]);
+
   if (!filteredData || filteredData.length < 2 || allTopics.length === 0) {
     return (
       <div className="flex items-center justify-center h-40 text-sm text-[#8A8278]">
-        No weight history yet — interact with articles to build your trajectory.
+        No weight history yet &mdash; interact with articles to build your trajectory.
       </div>
     );
   }
 
-  const W = 680;
-  const padL = 36;
-  const padR = 12;
-  const padT = 12;
-  const padB = 24;
-  const innerW = W - padL - padR;
-  const innerH = height - padT - padB;
-
-  // Y axis: always 0–1
+  // Y axis: always 0-1
   const toY = (v: number) => padT + (1 - v) * innerH;
   const toX = (i: number) => padL + (i / (filteredData.length - 1)) * innerW;
-
-  const handleMouseMove = useCallback((e: React.MouseEvent<SVGSVGElement>) => {
-    if (!svgRef.current) return;
-    const rect = svgRef.current.getBoundingClientRect();
-    const xRatio = (e.clientX - rect.left - padL * (rect.width / W)) / (innerW * (rect.width / W));
-    const idx = Math.round(xRatio * (filteredData.length - 1));
-    setCrosshair(Math.max(0, Math.min(filteredData.length - 1, idx)));
-  }, [filteredData.length, innerW]);
 
   const crosshairPoint = crosshair !== null ? filteredData[crosshair] : null;
   const crosshairX = crosshair !== null ? toX(crosshair) : null;
@@ -249,7 +254,7 @@ export function TopicWeightChart({ data, height = 220 }: TopicWeightChartProps) 
                 className="inline-block w-2.5 h-2.5 rounded-full shrink-0"
                 style={{ backgroundColor: hidden ? "#C8C3BB" : color }}
               />
-              {topic.length > 22 ? topic.slice(0, 20) + "…" : topic}
+              {topic.length > 22 ? topic.slice(0, 20) + "..." : topic}
             </button>
           );
         })}

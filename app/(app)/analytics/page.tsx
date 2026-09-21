@@ -39,7 +39,10 @@ export default function AnalyticsPage() {
     }
   }, []);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+    // Fetch is called via the stable useCallback ref; setState only runs after async resolution
+    load(); // eslint-disable-line react-hooks/set-state-in-effect
+  }, [load]);
 
   const handleSnapshot = async () => {
     setSnapshotting(true);
@@ -168,17 +171,17 @@ export default function AnalyticsPage() {
 
         {/* Knowledge Depth */}
         <div className="bg-white rounded-xl border border-[#E9E5DE] p-5 shadow-xs">
-          <div className="mb-4 flex items-start justify-between">
-            <div>
+          <div className="mb-4 flex items-center justify-between gap-3">
+            <div className="min-w-0 flex-1">
               <h2 className="text-sm font-bold text-[#181715]">Knowledge Depth by Topic</h2>
               <p className="text-xs text-[#8A8278] mt-0.5">
-                Engagement depth vs tracking weight — gaps flagged in amber
+                Engagement depth vs tracking weight gaps flagged in amber
               </p>
             </div>
             {data && data.knowledgeDepth.some((d) => d.gap) && (
-              <span className="flex items-center gap-1 text-[10px] font-semibold text-[#D97706] bg-[#FFFBEB] border border-[#FDE68A] px-2 py-0.5 rounded-full">
-                <AlertTriangle className="w-3 h-3" />
-                {data.knowledgeDepth.filter((d) => d.gap).length} gap{data.knowledgeDepth.filter((d) => d.gap).length !== 1 ? "s" : ""}
+              <span className="shrink-0 whitespace-nowrap inline-flex items-center gap-1 text-[10px] font-medium text-[#D97706] bg-[#FFFBEB] border border-[#FDE68A] px-2 py-0.5 rounded-full shadow-2xs">
+                <AlertTriangle className="w-3 h-3 text-[#D97706] shrink-0" />
+                <span>{data.knowledgeDepth.filter((d) => d.gap).length} gaps</span>
               </span>
             )}
           </div>

@@ -46,7 +46,7 @@ export function KnowledgeDepthBar({ entries, onSelectTopic }: KnowledgeDepthBarP
                     />
                   </span>
                 )}
-                <span className="truncate max-w-[160px]">{entry.topic}</span>
+                <span className="truncate flex-1 min-w-0 pr-2">{entry.topic}</span>
               </span>
               <span className="text-[10px] text-[#8A8278] tabular-nums shrink-0 ml-2">
                 {depthPct}% depth

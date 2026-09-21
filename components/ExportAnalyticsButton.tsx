@@ -73,8 +73,8 @@ export function ExportAnalyticsButton({
           }
         }
       }
-    } catch (err: any) {
-      alert(err?.message || "Export failed. Please try again.");
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : "Export failed. Please try again.");
     } finally {
       setLoading(null);
       setOpen(false);
